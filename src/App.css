@@ -1,3 +1,25 @@
 :root {
   background-color: #f2f7ff;
 }
+/* styles.css */
+body {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+/* .react-datepicker-wrapper {
+  height: "40px";
+  border: "none";
+}
+.react-datepicker-wrapper .react-datepicker__input-container {
+  height: 40px;
+  border: "none";
+} */
+.react-datepicker-wrapper .admissionDate {
+  height: 40px !important;
+  border: "none";
+}
+.react-datepicker-wrapper .dob-datepicker {
+  height: 45px;
+  border-radius: 8px;
+  border: 1px solid grey;
+  width: 280px !important;
+}

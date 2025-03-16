@@ -7,7 +7,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 
-export default function BasicTable({ columns, rows }) {
+export default function BasicTable({ columns, rows, onClickFunction }) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -32,7 +32,12 @@ export default function BasicTable({ columns, rows }) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               {Object.keys(row).map((key, cellIndex) => (
-                <TableCell key={cellIndex} component="td" align="left">
+                <TableCell
+                  key={cellIndex}
+                  component="td"
+                  align="left"
+                  onClick={() => onClickFunction(row[key])}
+                >
                   {row[key]}
                 </TableCell>
               ))}

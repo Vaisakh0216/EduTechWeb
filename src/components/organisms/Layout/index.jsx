@@ -23,7 +23,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import logo from "../../../assets/Logo.png";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
-const drawerWidth = 260;
+const drawerWidth = 280;
 
 function ResponsiveDrawer(props) {
   const { window, children } = props;
@@ -53,37 +53,39 @@ function ResponsiveDrawer(props) {
   const Menu = [
     {
       key: "Dashboard",
-      icon: <DashboardIcon />,
+      icon: <DashboardIcon style={{ color: "white" }} />,
     },
     {
       key: <CustomAccordion />,
-      icon: <SchoolIcon />,
+      icon: <SchoolIcon style={{ color: "white" }} />,
     },
     {
       key: "Payment",
-      icon: <CurrencyRupeeIcon />,
+      icon: <CurrencyRupeeIcon style={{ color: "white" }} />,
     },
   ];
 
   const drawer = (
-    <div>
+    <div style={{ backgroundColor: "#031C30", height: "100%" }}>
       <Toolbar
         style={{
           display: "flex",
           justifyContent: "center",
           height: "80px",
+          backgroundColor: "white",
         }}
       >
-        <img src={logo} width="100px" height="50px" />
+        <img src={logo} width="180px" height="60px" />
       </Toolbar>
       <Divider />
       <List style={{ marginTop: "20px" }}>
         {Menu.map((text, index) => (
-          <ListItem key={text.key} disablePadding>
+          <ListItem key={text.key} disablePadding style={{ marginTop: "10px" }}>
             <ListItemButton>
               <ListItemIcon>{text?.icon}</ListItemIcon>
               {typeof text.key === "string" ? (
                 <ListItemText
+                  style={{ color: "white" }}
                   primary={text.key}
                   onClick={() => {
                     redirectToPage(text.key);
@@ -111,7 +113,7 @@ function ResponsiveDrawer(props) {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          backgroundColor: "white",
+          backgroundColor: "#031C30",
           height: "80px",
         }}
       >
@@ -125,9 +127,7 @@ function ResponsiveDrawer(props) {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Responsive drawer
-          </Typography>
+          <Typography variant="h6" noWrap component="div"></Typography>
         </Toolbar>
       </AppBar>
       <Box

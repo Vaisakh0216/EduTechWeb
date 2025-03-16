@@ -6,6 +6,7 @@ import "./App.css";
 import Onboard from "./pages/Admission/Onboard";
 import College from "./pages/Admission/College";
 import Course from "./pages/Admission/Course";
+import Payment from "./pages/Payment/index";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/Onboard" element={<Onboard />} />
           <Route path="/College" element={<College />} />
           <Route path="/Course" element={<Course />} />
+          <Route path="/Payment" element={<Payment />} />
         </Routes>
       </ResponsiveDrawer>
     </BrowserRouter>

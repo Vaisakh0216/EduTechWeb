@@ -1,13 +1,23 @@
-import { Button, TextField } from "@mui/material";
+import { Button, Checkbox, TextField } from "@mui/material";
 import React, { useState } from "react";
 import BasicTable from "../../components/atoms/Table";
 import Drawer from "../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function Onboard() {
   const [open, setOpen] = useState(false);
+  const [startDate, setStartDate] = useState();
+  const [state, setState] = useState({
+    agent: false,
+    main: false,
+    sub: false,
+    college: false,
+    combainedFee: false,
+  });
 
   const columns = [
     "Admission Number",
@@ -91,6 +101,14 @@ function Onboard() {
       actions: <DeleteIcon />,
     },
   ];
+
+  const handleCheckboxChange = (event) => {
+    const { name, checked } = event.target;
+    setState((prevState) => ({
+      ...prevState,
+      [name]: checked,
+    }));
+  };
 
   return (
     <div>
@@ -205,6 +223,7 @@ function Onboard() {
       </div>
       {open && (
         <Drawer
+          width="60%"
           open={open}
           setOpen={setOpen}
           content={
@@ -215,14 +234,693 @@ function Onboard() {
                   justifyContent: "space-between",
                   alignItems: "center",
                   padding: "15px",
-                  borderBottom: "1px solid black",
+                  borderBottom: "1px solid gray",
                 }}
               >
                 <h3>Create Admission</h3>
                 <ClearIcon onClick={() => setOpen(false)} />
               </div>
-              <div style={{ margin: "0px 15px" }}>
-                <h6>Basic information</h6>
+              <div
+                style={{
+                  padding: "15px",
+                  marginTop: "20px",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                  }}
+                >
+                  <label style={{ fontWeight: "bold", width: "160px" }}>
+                    Select Academic Year:
+                  </label>
+                  <select
+                    id="my-select"
+                    style={{
+                      height: "40px",
+                    }}
+                  >
+                    <option value="option1">2024-2025</option>
+                    <option value="option2">2025-2026</option>
+                    <option value="option3">2026-2027</option>
+                    <option value="option3">2027-2028</option>
+                  </select>
+                </div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    marginTop: "10px",
+                  }}
+                >
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      width: "160px",
+                    }}
+                  >
+                    Admission Date:
+                  </label>
+                  <DatePicker
+                    className="admissionDate"
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    placeholderText="DD-MM-YYYY"
+                  />
+                </div>
+                <div
+                  style={{
+                    marginTop: "50px",
+                    display: "flex",
+                    gap: "10px",
+                  }}
+                >
+                  <TextField
+                    id="outlined-basic"
+                    label="Name"
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      "& .MuiInputBase-root": {
+                        height: "45px",
+                        borderRadius: "8px",
+                      },
+                      "& .MuiInputLabel-root": {
+                        top: "-5px",
+                        fontSize: "14px",
+                      },
+                    }}
+                  />
+                  <DatePicker
+                    className="dob-datepicker"
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    placeholderText="DOB"
+                  />
+                  <select
+                    id="my-select"
+                    style={{
+                      width: "100%",
+                      height: "45px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <option value="">Select Religion</option>
+                    <option value="option1">Humanity</option>
+                    <option value="option2">Christian</option>
+                    <option value="option3">Hinduism</option>
+                    <option value="option3">Islam</option>
+                  </select>
+                </div>
+                <div
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    gap: "10px",
+                  }}
+                >
+                  <select
+                    id="my-select"
+                    style={{
+                      width: "100%",
+                      height: "45px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <option value="">Select +2 Stream</option>
+                    <option value="option1">Science</option>
+                    <option value="option2">Commerce</option>
+                    <option value="option3">Arts</option>
+                    <option value="option3">Economics</option>
+                  </select>
+                  <TextField
+                    id="outlined-basic"
+                    label="Address"
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      "& .MuiInputBase-root": {
+                        height: "45px",
+                        borderRadius: "8px",
+                      },
+                      "& .MuiInputLabel-root": {
+                        top: "-5px",
+                        fontSize: "14px",
+                      },
+                    }}
+                  />
+                  <select
+                    id="my-select"
+                    style={{
+                      width: "100%",
+                      height: "45px",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <option value="">Select College</option>
+                    <option value="option1">
+                      Christ College of Science and Management
+                    </option>
+                    <option value="option2">Garden City University</option>
+                  </select>
+                </div>
+                <div
+                  style={{
+                    marginTop: "20px",
+                    display: "flex",
+                    gap: "10px",
+                  }}
+                >
+                  <select
+                    id="my-select"
+                    style={{
+                      height: "45px",
+                      borderRadius: "8px",
+                      width: "100%",
+                    }}
+                  >
+                    <option value="">Select Course</option>
+                    <option value="option1">Bachelor of Arts</option>
+                    <option value="option2">Bachelor of Commerce</option>
+                    <option value="option2">
+                      Bachelor of Business Administration
+                    </option>
+                  </select>
+                  <TextField
+                    id="outlined-basic"
+                    label="Address"
+                    variant="outlined"
+                    sx={{
+                      width: "100%",
+                      "& .MuiInputBase-root": {
+                        height: "45px",
+                        borderRadius: "8px",
+                      },
+                      "& .MuiInputLabel-root": {
+                        top: "-5px",
+                        fontSize: "14px",
+                      },
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Checkbox
+                      name="agent"
+                      checked={state?.agent}
+                      onChange={handleCheckboxChange}
+                    />
+                    <span style={{ fontSize: "14px" }}>Agent</span>
+                  </div>
+                </div>
+                {state?.agent && (
+                  <div style={{ marginTop: "40px" }}>
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
+                          width: "100%",
+                          alignItems: "center",
+                          fontSize: "14px",
+                        }}
+                      >
+                        <Checkbox
+                          name="main"
+                          checked={state?.main}
+                          onChange={handleCheckboxChange}
+                        />
+                        <span>Main Agent</span>
+                      </div>
+                      {state?.main && (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            padding: "10px",
+                          }}
+                        >
+                          <TextField
+                            id="outlined-basic"
+                            label="Agent Name"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            label="Contact Number"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            label="Amount"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
+                          width: "100%",
+                          alignItems: "center",
+                          fontSize: "14px",
+                        }}
+                      >
+                        <Checkbox
+                          name="sub"
+                          checked={state?.sub}
+                          onChange={handleCheckboxChange}
+                        />
+                        <span>Sub Agent</span>
+                      </div>
+                      {state?.sub && (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            padding: "10px",
+                          }}
+                        >
+                          <TextField
+                            id="outlined-basic"
+                            label="Agent Name"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            label="Contact Number"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            label="Amount"
+                            variant="outlined"
+                            sx={{
+                              width: "100%",
+                              "& .MuiInputBase-root": {
+                                height: "45px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-5px",
+                                fontSize: "14px",
+                              },
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <div
+                          style={{
+                            display: "flex",
+                            width: "100%",
+                            alignItems: "center",
+                            fontSize: "14px",
+                          }}
+                        >
+                          <Checkbox
+                            name="college"
+                            checked={state?.college}
+                            onChange={handleCheckboxChange}
+                          />
+                          <span>College Agent</span>
+                        </div>
+                        {state?.college && (
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "10px",
+                              padding: "10px",
+                            }}
+                          >
+                            <TextField
+                              id="outlined-basic"
+                              label="Agent Name"
+                              variant="outlined"
+                              sx={{
+                                width: "100%",
+                                "& .MuiInputBase-root": {
+                                  height: "45px",
+                                  borderRadius: "8px",
+                                },
+                                "& .MuiInputLabel-root": {
+                                  top: "-5px",
+                                  fontSize: "14px",
+                                },
+                              }}
+                            />
+                            <TextField
+                              id="outlined-basic"
+                              label="Contact Number"
+                              variant="outlined"
+                              sx={{
+                                width: "100%",
+                                "& .MuiInputBase-root": {
+                                  height: "45px",
+                                  borderRadius: "8px",
+                                },
+                                "& .MuiInputLabel-root": {
+                                  top: "-5px",
+                                  fontSize: "14px",
+                                },
+                              }}
+                            />
+                            <TextField
+                              id="outlined-basic"
+                              label="Amount"
+                              variant="outlined"
+                              sx={{
+                                width: "100%",
+                                "& .MuiInputBase-root": {
+                                  height: "45px",
+                                  borderRadius: "8px",
+                                },
+                                "& .MuiInputLabel-root": {
+                                  top: "-5px",
+                                  fontSize: "14px",
+                                },
+                              }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: "bolder" }}>
+                    Contact Numbers
+                  </h3>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <TextField
+                      id="outlined-basic"
+                      label="Student"
+                      variant="outlined"
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                    />
+                    <TextField
+                      id="outlined-basic"
+                      label="Mother"
+                      variant="outlined"
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                    />
+                    <TextField
+                      id="outlined-basic"
+                      label="Father"
+                      variant="outlined"
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "16px", fontWeight: "bolder" }}>
+                    Fees Structure
+                  </h3>
+                  <div
+                    style={{
+                      display: "flex",
+                      width: "100%",
+                      alignItems: "center",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <Checkbox
+                      name="combainedFee"
+                      checked={state?.combainedFee}
+                      onChange={handleCheckboxChange}
+                    />
+                    <span>Tution / Hostel fee combained</span>
+                  </div>
+                  {state?.combainedFee ? (
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <TextField
+                        id="outlined-basic"
+                        label="1st Year"
+                        variant="outlined"
+                        sx={{
+                          width: "100%",
+                          "& .MuiInputBase-root": {
+                            height: "45px",
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            top: "-5px",
+                            fontSize: "14px",
+                          },
+                        }}
+                      />
+                      <TextField
+                        id="outlined-basic"
+                        label="2nd Year"
+                        variant="outlined"
+                        sx={{
+                          width: "100%",
+                          "& .MuiInputBase-root": {
+                            height: "45px",
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            top: "-5px",
+                            fontSize: "14px",
+                          },
+                        }}
+                      />
+                      <TextField
+                        id="outlined-basic"
+                        label="3rd Year"
+                        variant="outlined"
+                        sx={{
+                          width: "100%",
+                          "& .MuiInputBase-root": {
+                            height: "45px",
+                            borderRadius: "8px",
+                          },
+                          "& .MuiInputLabel-root": {
+                            top: "-5px",
+                            fontSize: "14px",
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 style={{ fontSize: "16px", fontWeight: "bolder" }}>
+                        Tution Fee
+                      </h3>
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <TextField
+                          id="outlined-basic"
+                          label="1st Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                        <TextField
+                          id="outlined-basic"
+                          label="2nd Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                        <TextField
+                          id="outlined-basic"
+                          label="3rd Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                      </div>
+                      <h3 style={{ fontSize: "16px", fontWeight: "bolder" }}>
+                        Hostel Fee
+                      </h3>
+                      <div style={{ display: "flex", gap: "10px" }}>
+                        <TextField
+                          id="outlined-basic"
+                          label="1st Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                        <TextField
+                          id="outlined-basic"
+                          label="2nd Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                        <TextField
+                          id="outlined-basic"
+                          label="3rd Year"
+                          variant="outlined"
+                          sx={{
+                            width: "100%",
+                            "& .MuiInputBase-root": {
+                              height: "45px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-5px",
+                              fontSize: "14px",
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div
+                  style={{
+                    marginTop: "40px",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <span style={{ fontSize: "14px", fontWeight: "600" }}>
+                    Total fees to be paid:
+                  </span>
+                </div>
               </div>
               <div
                 style={{
@@ -230,7 +928,6 @@ function Onboard() {
                   display: "flex",
                   justifyContent: "end",
                   bottom: 0,
-                  position: "fixed",
                   right: 0,
                 }}
               >

@@ -1,3 +1,4 @@
+import { colors } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +12,7 @@ const CustomAccordion = () => {
   };
 
   const headerStyle = {
-    color: "Black",
+    color: "white",
     cursor: "pointer",
     textAlign: "left",
   };
@@ -23,9 +24,10 @@ const CustomAccordion = () => {
 
   const listItemStyle = {
     padding: "8px",
-    fontSize: "14px",
+    fontSize: "16px",
     cursor: "pointer",
     width: "full",
+    color: "white",
   };
 
   return (
@@ -42,7 +44,7 @@ const CustomAccordion = () => {
               console.log("Clicking onbaord");
             }}
           >
-            Student Onboarding
+            Student
           </div>
           <div
             style={listItemStyle}

@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { useSpring, animated } from "react-spring";
-import ClearIcon from "@mui/icons-material/Clear";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-const Drawer = ({ open, setOpen, content }) => {
+const Drawer = ({ open, setOpen, content, width = "40%" }) => {
   // Slide-in and fade-in animations
   const slideIn = useSpring({
-    transform: open ? "translateX(0)" : "translateX(100%)", // Slide in from the right (100% from the right)
+    transform: open ? "translateX(0)" : "translateX(100%)",
   });
 
   const fade = useSpring({
@@ -28,7 +26,7 @@ const Drawer = ({ open, setOpen, content }) => {
     position: "fixed",
     top: 0,
     right: 0, // Position the drawer to the right of the screen
-    width: "40%",
+    width: width,
     height: "100%",
     backgroundColor: "#FFFF",
     color: "white",
