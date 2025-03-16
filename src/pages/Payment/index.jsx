@@ -1,7 +1,7 @@
 import React from "react";
 import BasicTabs from "../../components/atoms/Tab";
-import StudentFee from "./studentFee";
-import AgentFee from "./agentFee";
+import StudentFee from "./StudentFee";
+import AgentFee from "./AgentFee";
 
 function Payment() {
   const headers = ["Student Fee", "Service Charge"];
