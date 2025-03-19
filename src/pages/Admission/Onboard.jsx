@@ -1,5 +1,5 @@
 import { Button, Checkbox, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BasicTable from "../../components/atoms/Table";
 import Drawer from "../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -7,6 +7,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axiosInstance from "../../config/axiosConfig";
 
 function Onboard() {
   const [open, setOpen] = useState(false);
@@ -18,6 +19,30 @@ function Onboard() {
     college: false,
     combainedFee: false,
   });
+  const [admission, setAdmission] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axiosInstance.get("students");
+        console.log(res.data);
+        setAdmission(
+          res?.data?.map((item) => ({
+            aNumber: item?.id,
+            Name: item?.first_name,
+            CollegeName: item?.institute_id,
+            admissionDate: item?.created_at,
+            course: item?.course_id,
+            actions: <DeleteIcon />,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const columns = [
     "Admission Number",
@@ -219,7 +244,7 @@ function Onboard() {
             <span>Per page</span>
           </div>
         </div>
-        <BasicTable columns={columns} rows={rows} />
+        <BasicTable columns={columns} rows={admission} />
       </div>
       {open && (
         <Drawer

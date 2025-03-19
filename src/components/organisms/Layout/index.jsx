@@ -16,7 +16,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import CustomAccordion from "../../atoms/Accordion";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
@@ -180,7 +180,9 @@ function ResponsiveDrawer(props) {
         }}
       >
         <Toolbar />
-        <Typography sx={{ marginBottom: 2 }}>{children}</Typography>
+        <Typography sx={{ marginBottom: 2 }}>
+          <Outlet />
+        </Typography>
       </Box>
     </Box>
   );

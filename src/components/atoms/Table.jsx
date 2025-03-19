@@ -31,6 +31,9 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
               key={rowIndex}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
+              <TableCell key={rowIndex} component="td" align="left">
+                {rowIndex + 1}
+              </TableCell>
               {Object.keys(row).map((key, cellIndex) => (
                 <TableCell
                   key={cellIndex}

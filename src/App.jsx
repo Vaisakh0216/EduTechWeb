@@ -7,19 +7,24 @@ import Onboard from "./pages/Admission/Onboard";
 import College from "./pages/Admission/College";
 import Course from "./pages/Admission/Course";
 import Payment from "./pages/Payment/index";
+import Login from "./pages/Login";
+import PrivateRoute from "./routes/PrivateRoute";
 
 function App() {
   return (
     <BrowserRouter>
-      <ResponsiveDrawer>
-        <Routes>
-          <Route path="/Dashboard" element={<Dashboard />} />
-          <Route path="/Onboard" element={<Onboard />} />
-          <Route path="/College" element={<College />} />
-          <Route path="/Course" element={<Course />} />
-          <Route path="/Payment" element={<Payment />} />
-        </Routes>
-      </ResponsiveDrawer>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route element={<ResponsiveDrawer />}>
+          <Route element={<PrivateRoute />}>
+            <Route path="/Dashboard" element={<Dashboard />} />
+            <Route path="/Onboard" element={<Onboard />} />
+            <Route path="/College" element={<College />} />
+            <Route path="/Course" element={<Course />} />
+            <Route path="/Payment" element={<Payment />} />
+          </Route>
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
