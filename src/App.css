@@ -16,10 +16,12 @@ body {
 .react-datepicker-wrapper .admissionDate {
   height: 40px !important;
   border: "none";
+  width: 100%;
+  border-radius: 8px;
 }
 .react-datepicker-wrapper .dob-datepicker {
   height: 45px;
   border-radius: 8px;
   border: 1px solid grey;
-  width: 280px !important;
+  width: 270px !important;
 }

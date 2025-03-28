@@ -9,6 +9,7 @@ import Course from "./pages/Admission/Course";
 import Payment from "./pages/Payment/index";
 import Login from "./pages/Login";
 import PrivateRoute from "./routes/PrivateRoute";
+import Agents from "./pages/Admission/Agents";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/College" element={<College />} />
             <Route path="/Course" element={<Course />} />
             <Route path="/Payment" element={<Payment />} />
+            <Route path="/Agent" element={<Agents />} />
           </Route>
         </Route>
       </Routes>

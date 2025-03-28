@@ -62,6 +62,14 @@ const CustomAccordion = () => {
           >
             Course
           </div>
+          <div
+            style={listItemStyle}
+            onClick={() => {
+              navigate("/Agent");
+            }}
+          >
+            Agent
+          </div>
           <div style={listItemStyle} onClick={() => handleToggle(1)}></div>
         </div>
       )}

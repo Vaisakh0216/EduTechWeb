@@ -26,7 +26,7 @@ import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 const drawerWidth = 280;
 
 function ResponsiveDrawer(props) {
-  const { window, children } = props;
+  const { window } = props;
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);

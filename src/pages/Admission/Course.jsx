@@ -1,18 +1,14 @@
-import {
-  Button,
-  FormControl,
-  FormHelperText,
-  TextField,
-  TextareaAutosize,
-} from "@mui/material";
-import React, { useState } from "react";
+import { Button, FormControl, FormHelperText, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import BasicTable from "../../components/atoms/Table";
 import Drawer from "../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { createCourse } from "../../services/createCourse";
 import CustomCircularProgress from "../../components/atoms/CircularProgress";
+import { listCourses } from "../../services/listCourses";
+import { listUniversities } from "../../services/listUniversities";
+import courseImage from "../../assets/course.jpg";
 
 function Course() {
   const [open, setOpen] = useState(false);
@@ -27,39 +23,10 @@ function Course() {
     university: "",
   });
   const [loading, setLoading] = useState(false);
-  const columns = ["Course Name", "Course Code", "Course Duration", "Action"];
-  const rows = [
-    {
-      cName: "Bachelor of Arts",
-      cNumber: "BA",
-      tCourses: "3",
-      actions: <DeleteIcon />,
-    },
-    {
-      cName: "Bachelor of Commerce",
-      cNumber: "B.Com",
-      tCourses: "3",
-      actions: <DeleteIcon />,
-    },
-    {
-      cName: "Bachelor of Business Administration",
-      cNumber: "BBA",
-      tCourses: "3",
-      actions: <DeleteIcon />,
-    },
-    {
-      cName: "Bachelor of Hotel Management",
-      cNumber: "BHM",
-      tCourses: "4",
-      actions: <DeleteIcon />,
-    },
-    {
-      cName: "Bachelor of Computer Application (BCA)",
-      cNumber: "+91 989382389",
-      tCourses: "3",
-      actions: <DeleteIcon />,
-    },
-  ];
+  const [courseList, setCourseList] = useState([]);
+  const [universityList, setUniversityList] = useState([]);
+  const [createOrEdit, setCreateOrEdit] = useState("");
+  const columns = ["Course Name", "Course Code", "Course Duration"];
 
   const validateForm = () => {
     let isValid = true;
@@ -70,7 +37,6 @@ function Course() {
       university: "",
     };
 
-    // Validate Course Name
     if (!courseName) {
       tempErrors.courseName = "Course Name is required.";
       isValid = false;
@@ -99,28 +65,68 @@ function Course() {
   };
 
   const handleSubmit = () => {
-    setLoading(true);
     const payload = {
       name: courseName,
       short_code: courseCode,
       duration: courseDuration,
-      university_id: 1,
+      university_id: university,
     };
     if (validateForm()) {
+      setLoading(true);
       createCourse(payload).then((res) => {
         setLoading(false);
         setOpen(false);
+        getCourselist();
+        setCourseName("");
+        setCourseCode("");
+        setCourseDuration("");
+        setUniversity("");
       });
     }
   };
 
-  console.log(
-    "the details",
-    courseCode,
-    courseDuration,
-    courseName,
-    university
-  );
+  const getCourselist = () => {
+    const universityMap = new Map();
+    universityList.forEach((uni) => {
+      universityMap && universityMap.set(uni.id, uni.name);
+    });
+
+    listCourses().then((res) => {
+      setCourseList(
+        res?.map((item) => {
+          const universityName = universityMap.get(item?.university_id);
+          return {
+            name: universityName
+              ? `${item?.name} / ${universityName}`
+              : item?.name,
+            short_code: item?.short_code,
+            duration: item?.duration + " " + "Years",
+          };
+        })
+      );
+    });
+  };
+
+  useEffect(() => {
+    getCourselist();
+  }, [universityList]);
+
+  useEffect(() => {
+    listUniversities().then((res) => setUniversityList(res));
+  }, []);
+
+  const getCourseDetails = (res) => {
+    setCreateOrEdit("detail");
+    setOpen(true);
+    setCourseName(res?.name?.split("/")[0]);
+    setCourseCode(res?.short_code);
+    setCourseDuration(res?.duration);
+    setUniversity(res?.name?.split("/")[1]);
+
+    console.log("the res", res);
+  };
+
+  console.log("course name exist", courseName);
 
   return (
     <div>
@@ -172,7 +178,14 @@ function Course() {
               textTransform: "inherit",
               cursor: "pointer",
             }}
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              setCreateOrEdit("create");
+              setCourseCode("");
+              setCourseDuration("");
+              setCourseName("");
+              setUniversity("");
+            }}
           >
             Create Course
           </Button>
@@ -204,14 +217,20 @@ function Course() {
             <span>Per page</span>
           </div>
         </div>
-        <BasicTable columns={columns} rows={rows} />
+        <div>
+          <BasicTable
+            columns={columns}
+            rows={courseList}
+            onClickFunction={getCourseDetails}
+          />
+        </div>
       </div>
       {open && (
         <Drawer
           open={open}
           setOpen={setOpen}
           content={
-            <div style={{ color: "black", overflowY: "scroll" }}>
+            <div style={{ color: "black" }}>
               <div
                 style={{
                   display: "flex",
@@ -221,14 +240,22 @@ function Course() {
                   borderBottom: "1px solid black",
                 }}
               >
-                <h3>Create Course</h3>
-                <ClearIcon onClick={() => setOpen(false)} />
+                <h3>
+                  {createOrEdit === "create"
+                    ? "Create Course"
+                    : "Update Course"}
+                </h3>
+                <ClearIcon
+                  onClick={() => setOpen(false)}
+                  style={{ cursor: "pointer" }}
+                />
               </div>
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  marginTop: "50px",
                 }}
               >
                 <div
@@ -241,10 +268,9 @@ function Course() {
                     display: "flex", // Enable flexbox on parent div
                     justifyContent: "center", // Center the child div horizontally
                     alignItems: "center", // Center the child div vertically
-                    position: "relative",
                   }}
                 >
-                  <div
+                  {/* <div
                     style={{
                       width: "160px",
                       height: "160px",
@@ -255,158 +281,295 @@ function Course() {
                   />
                   <div style={{ position: "absolute" }}>
                     <AddPhotoAlternateIcon fontSize="large" color="disabled" />
-                  </div>
+                  </div> */}
+                  <img
+                    src={courseImage}
+                    style={{
+                      backgroundColor: "blue",
+                      width: "180px",
+                      height: "180px",
+                      borderRadius: "50%", // Make the outer div a circle
+                    }}
+                  />
                 </div>
               </div>
               <div style={{ padding: "20px 20px 0px 20px" }}>
-                <h4>Course Details</h4>
+                {createOrEdit === "create" ? (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                      }}
+                    >
+                      <FormControl
+                        error={Boolean(errors.courseName)}
+                        style={{ width: "100%" }}
+                      >
+                        <TextField
+                          id="outlined-basic"
+                          label="Course Name"
+                          variant="outlined"
+                          style={{ width: "100%" }}
+                          sx={{
+                            "& .MuiInputBase-root": {
+                              height: "50px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-2px",
+                              fontSize: "14px",
+                            },
+                          }}
+                          value={courseName}
+                          onChange={(e) => {
+                            setCourseName(e.target.value);
+                          }}
+                        />
+                        {errors.courseName && (
+                          <FormHelperText>{errors.courseName}</FormHelperText>
+                        )}
+                      </FormControl>
+                      <FormControl
+                        error={Boolean(errors.courseCode)}
+                        style={{ width: "100%" }}
+                      >
+                        <TextField
+                          id="outlined-basic"
+                          label="Course Short Code"
+                          variant="outlined"
+                          style={{ width: "100%" }}
+                          sx={{
+                            "& .MuiInputBase-root": {
+                              height: "50px",
+                              borderRadius: "8px",
+                            },
+                            "& .MuiInputLabel-root": {
+                              top: "-2px",
+                              fontSize: "14px",
+                            },
+                          }}
+                          value={courseCode}
+                          onChange={(e) => setCourseCode(e.target.value)}
+                        />
+                        {errors.courseCode && (
+                          <FormHelperText>{errors.courseCode}</FormHelperText>
+                        )}
+                      </FormControl>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "10px",
+                        marginTop: "10px",
+                      }}
+                    >
+                      <FormControl
+                        fullWidth
+                        error={Boolean(errors.courseDuration)}
+                      >
+                        <select
+                          id="my-select"
+                          style={{
+                            width: "100%",
+                            height: "50px",
+                            borderRadius: "8px",
+                            border: "1px solid lightgray",
+                            padding: "10px",
+                            fontSize: "16px",
+                          }}
+                          value={courseDuration}
+                          onChange={(e) => setCourseDuration(e.target.value)}
+                        >
+                          <option value="">Select Duration</option>
+                          <option value="1">1 Year</option>
+                          <option value="2">2 Years</option>
+                          <option value="3">3 Years</option>
+                          <option value="4"> 4 Years</option>
+                          <option value="5"> 5 Years</option>
+                        </select>
+                        {errors.courseDuration && (
+                          <FormHelperText>
+                            {errors.courseDuration}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+                      <FormControl fullWidth error={Boolean(errors.university)}>
+                        <select
+                          id="my-select"
+                          style={{
+                            width: "100%",
+                            height: "50px",
+                            borderRadius: "8px",
+                            border: "1px solid lightgray",
+                            padding: "10px",
+                            fontSize: "16px",
+                          }}
+                          value={university}
+                          onChange={(e) => setUniversity(e.target.value)}
+                        >
+                          <option value="">Select University</option>
+                          {universityList.length &&
+                            universityList?.map((uni) => (
+                              <option id={uni?.id} value={uni?.id}>
+                                {uni?.name}
+                              </option>
+                            ))}
+                        </select>
+                        {errors.university && (
+                          <FormHelperText>{errors.university}</FormHelperText>
+                        )}
+                      </FormControl>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ marginTop: "50px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            width: "50%",
+                          }}
+                        >
+                          <h4
+                            style={{ padding: 0, margin: 0, fontSize: "14px" }}
+                          >
+                            Course Name
+                          </h4>
+                          <p
+                            style={{
+                              padding: 0,
+                              margin: "10px 0px",
+                              textAlign: "center",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {courseName}
+                          </p>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            width: "50%",
+                          }}
+                        >
+                          <h4
+                            style={{ padding: 0, margin: 0, fontSize: "14px" }}
+                          >
+                            Course Short Code
+                          </h4>
+                          <p
+                            style={{
+                              padding: 0,
+                              margin: "10px 0px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {courseCode}
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          marginTop: "50px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            width: "50%",
+                          }}
+                        >
+                          <h4
+                            style={{ padding: 0, margin: 0, fontSize: "14px" }}
+                          >
+                            Course Duration
+                          </h4>
+                          <p
+                            style={{
+                              padding: 0,
+                              margin: "10px 0px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {courseDuration}
+                          </p>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flexDirection: "column",
+                            width: "50%",
+                          }}
+                        >
+                          <h4
+                            style={{ padding: 0, margin: 0, fontSize: "14px" }}
+                          >
+                            University
+                          </h4>
+                          <p
+                            style={{
+                              padding: 0,
+                              margin: "10px 0px",
+                              fontSize: "14px",
+                            }}
+                          >
+                            {university}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+              {createOrEdit === "create" && (
                 <div
                   style={{
+                    padding: "50px 20px",
                     display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "10px",
+                    justifyContent: "end",
+                    bottom: 0,
+                    position: "fixed",
+                    right: 0,
                   }}
                 >
-                  <FormControl
-                    error={Boolean(errors.courseName)}
-                    style={{ width: "100%" }}
+                  <Button
+                    variant="outlined"
+                    onClick={() => setOpen(false)}
+                    style={{ textTransform: "inherit", padding: "8px 20px" }}
                   >
-                    <TextField
-                      id="outlined-basic"
-                      label="Course Name"
-                      variant="outlined"
-                      style={{ width: "100%" }}
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          height: "50px",
-                          borderRadius: "8px",
-                        },
-                        "& .MuiInputLabel-root": {
-                          top: "-2px",
-                          fontSize: "14px",
-                        },
-                      }}
-                      value={courseName}
-                      onChange={(e) => setCourseName(e.target.value)}
-                    />
-                    {errors.courseName && (
-                      <FormHelperText>{errors.courseName}</FormHelperText>
-                    )}
-                  </FormControl>
-                  <FormControl
-                    error={Boolean(errors.courseCode)}
-                    style={{ width: "100%" }}
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="contained"
+                    style={{
+                      marginLeft: "10px",
+                      textTransform: "inherit",
+                      padding: "8px 20px",
+                    }}
+                    onClick={() => handleSubmit()}
                   >
-                    <TextField
-                      id="outlined-basic"
-                      label="Course Short Code"
-                      variant="outlined"
-                      style={{ width: "100%" }}
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          height: "50px",
-                          borderRadius: "8px",
-                        },
-                        "& .MuiInputLabel-root": {
-                          top: "-2px",
-                          fontSize: "14px",
-                        },
-                      }}
-                      value={courseCode}
-                      onChange={(e) => setCourseCode(e.target.value)}
-                    />
-                    {errors.courseCode && (
-                      <FormHelperText>{errors.courseCode}</FormHelperText>
-                    )}
-                  </FormControl>
+                    {loading ? <CustomCircularProgress /> : "Create"}
+                  </Button>
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "10px",
-                    marginTop: "10px",
-                  }}
-                >
-                  <FormControl fullWidth error={Boolean(errors.courseDuration)}>
-                    <select
-                      id="my-select"
-                      style={{
-                        width: "100%",
-                        height: "50px",
-                        borderRadius: "8px",
-                        border: "1px solid lightgray",
-                        padding: "10px",
-                      }}
-                      value={courseDuration}
-                      onChange={(e) => setCourseDuration(e.target.value)}
-                    >
-                      <option value="">Select Duration</option>
-                      <option value="option1">2</option>
-                      <option value="option2">3</option>
-                      <option value="option3"> 4</option>
-                      <option value="option3"> 5</option>
-                    </select>
-                    {errors.courseDuration && (
-                      <FormHelperText>{errors.courseDuration}</FormHelperText>
-                    )}
-                  </FormControl>
-                  <FormControl fullWidth error={Boolean(errors.university)}>
-                    <select
-                      id="my-select"
-                      style={{
-                        width: "100%",
-                        height: "50px",
-                        borderRadius: "8px",
-                        border: "1px solid lightgray",
-                        padding: "10px",
-                      }}
-                      value={university}
-                      onChange={(e) => setUniversity(e.target.value)}
-                    >
-                      <option value="">Select University</option>
-                      <option value="option1">2</option>
-                      <option value="option2">3</option>
-                      <option value="option3"> 4</option>
-                      <option value="option3"> 5</option>
-                    </select>
-                    {errors.university && (
-                      <FormHelperText>{errors.university}</FormHelperText>
-                    )}
-                  </FormControl>
-                </div>
-              </div>
-              <div
-                style={{
-                  padding: "50px 20px",
-                  display: "flex",
-                  justifyContent: "end",
-                  bottom: 0,
-                  position: "fixed",
-                  right: 0,
-                }}
-              >
-                <Button
-                  variant="outlined"
-                  onClick={() => setOpen(false)}
-                  style={{ textTransform: "inherit", padding: "8px 20px" }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="contained"
-                  style={{
-                    marginLeft: "10px",
-                    textTransform: "inherit",
-                    padding: "8px 20px",
-                  }}
-                  onClick={() => handleSubmit()}
-                >
-                  {loading ? <CustomCircularProgress /> : "Create"}
-                </Button>
-              </div>
+              )}
             </div>
           }
         />

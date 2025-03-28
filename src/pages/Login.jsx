@@ -8,7 +8,7 @@ function Login() {
 
   const login = async () => {
     const credential = {
-      email: "vishnuvwdrs@gmail.com",
+      email: "vadakkumpattu@gmail.com",
       password: "12345",
     };
     try {

@@ -6,6 +6,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Drawer from "../../components/atoms/Drawer";
 import { Button, Stack, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import axiosInstance from "../../config/axiosConfig";
+import { listCourseFee } from "../../services/listCourseFee";
+import { listAdmissions } from "../../services/listAdmissions";
+import DatePicker from "react-datepicker";
 
 function StudentFee() {
   const [open, setOpen] = useState(false);
@@ -18,107 +22,54 @@ function StudentFee() {
     ref: "",
     status: "Paid",
   });
-  const [totalFee, setTotalFee] = useState(200000);
-
+  const [totalFee, setTotalFee] = useState(11450000);
   const [admissionNo, setAdmissionNo] = useState("");
+  const [admission, setAdmission] = useState([]);
+  const [courseFeeList, setCourseFeeList] = useState([]);
+  const [admissionDetail, setAdmissionDetail] = useState({
+    totalFee: "",
+  });
   const columns = [
     "Admission Number",
     "Student Name",
     "College Name",
     "Date",
     "Course",
-    "Action",
   ];
-  const rows = [
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-    {
-      aNumber: "XYZ-2025-0001230000000000",
-      Name: "Otor John",
-      CollegeName: "Garden City College",
-      admissionDate: "16/11/2022",
-      course: "BCA",
-      actions: <DeleteIcon />,
-    },
-  ];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await listAdmissions();
+        console.log("sssss", res);
+        setAdmission(
+          res?.map((item) => ({
+            aNumber: item?.id,
+            Name: item?.student?.first_name,
+            CollegeName: item?.institute?.name,
+            admissionDate: item?.admission_date,
+            course: item?.course_id,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const getCourseFeeList = async () => {
+      try {
+        const res = await listCourseFee();
+        setCourseFeeList(res);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    getCourseFeeList();
+  }, []);
 
   const TransactionHead = ["Transaction Id", "Description", "Amount", "Status"];
-  const TransactionRows = [
-    {
-      sn: "1",
-      TransactionId: "UPI12345678",
-      Description: "Payment received through Google Pay",
-      Amount: "20000",
-      Status: "Paid",
-    },
-  ];
-
-  // const addTransaction = () => {
-  //   // setTransactionRow((prev) => [
-  //   //   ...prev,
-  //   //   {
-  //   //     sn: "",
-  //   //     TransactionId: "",
-  //   //     Description: "",
-  //   //     Amount: "",
-  //   //     Status: "",
-  //   //   },
-  //   // ]);
-  // };
 
   const saveTransation = () => {
     setTransactionRow((prev) => [...prev, transactionDetail]);
@@ -127,7 +78,10 @@ function StudentFee() {
   const getDetail = (val) => {
     console.log("this is val", val);
     setOpen(true);
-    setAdmissionNo(val);
+    console.log(
+      "this is courseFees",
+      courseFeeList?.data?.filter((res) => res?.course_id == val?.course)
+    );
   };
 
   const handleChange = (e) => {
@@ -137,8 +91,6 @@ function StudentFee() {
       [name]: value,
     }));
   };
-
-  console.log("the details", transactionRow, transactionDetail);
 
   useEffect(() => {
     if (transactionRow.length) {
@@ -151,7 +103,11 @@ function StudentFee() {
 
   return (
     <div>
-      <BasicTable columns={columns} rows={rows} onClickFunction={getDetail} />
+      <BasicTable
+        columns={columns}
+        rows={admission}
+        onClickFunction={getDetail}
+      />
       {open && (
         <Drawer
           width="50%"
@@ -251,7 +207,7 @@ function StudentFee() {
                         padding: "4px",
                       }}
                     >
-                      From Collected From Student:
+                      Fee Collected From Student:
                     </h3>
                     <h3
                       style={{
@@ -301,6 +257,12 @@ function StudentFee() {
                           marginTop: "10px",
                         }}
                       >
+                        <DatePicker
+                          className="dob-datepicker"
+                          // selected={dobDate}
+                          // onChange={(date) => setDobDate(date)}
+                          placeholderText="DD-MM-YYYY"
+                        />
                         <TextField
                           id="outlined-basic"
                           name="ref"
@@ -388,7 +350,7 @@ function StudentFee() {
                         padding: "4px",
                       }}
                     >
-                      From Collected From Student:
+                      Fee to Paid to Collected:
                     </h3>
                     <h3
                       style={{
