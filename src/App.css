@@ -15,13 +15,18 @@ body {
 } */
 .react-datepicker-wrapper .admissionDate {
   height: 40px !important;
-  border: "none";
   width: 100%;
   border-radius: 8px;
+  border: 1px solid lightgray;
 }
 .react-datepicker-wrapper .dob-datepicker {
   height: 45px;
   border-radius: 8px;
-  border: 1px solid grey;
+  border: 1px solid lightgray;
   width: 270px !important;
+}
+.react-datepicker-wrapper .paymentDate {
+  height: 50px;
+  border-radius: 8px;
+  border: 1px solid lightgray;
 }

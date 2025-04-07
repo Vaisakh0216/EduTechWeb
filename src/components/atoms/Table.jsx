@@ -57,11 +57,11 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
+        <TableHead sx={{ backgroundColor: "lightgray" }}>
           <TableRow>
-            <TableCell style={{ fontWeight: "bold" }} align="center">
+            {/* <TableCell style={{ fontWeight: "bold" }} align="center">
               S/N
-            </TableCell>
+            </TableCell> */}
             {columns.map((col, index) => (
               <TableCell
                 key={index}
@@ -84,9 +84,9 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               onClick={() => onClickFunction(row)}
             >
-              <TableCell component="td" align="center">
+              {/* <TableCell component="td" align="center">
                 {rowIndex + 1}
-              </TableCell>
+              </TableCell> */}
               {Object.keys(row).map((key, cellIndex) => (
                 // Ensure a unique key by combining row.id with cellIndex
                 <TableCell

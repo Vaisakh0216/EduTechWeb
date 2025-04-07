@@ -27,6 +27,8 @@ function Onboard() {
   ];
   const [startDate, setStartDate] = useState();
   const [admission, setAdmission] = useState([]);
+  const [admissionCompleteList, setAdmissionCompleteList] = useState([]);
+  const [admissionNumber, setAdmissionNumber] = useState("");
   const [studentData, setStudentData] = useState({
     first_name: "",
     last_name: "",
@@ -47,42 +49,41 @@ function Onboard() {
     institute_id: "",
     course_id: "",
     status: "pending",
-    branch_id: "0",
+    branch_id: "1",
     agent_id: "",
   });
-  const [admissionDate, setAdmissionDate] = useState();
-  const [dobDate, setDobDate] = useState();
+  const [admissionDate, setAdmissionDate] = useState(new Date());
+  const [dobDate, setDobDate] = useState(new Date());
   const [collegeList, setCollegeList] = useState([]);
   const [courseList, setCourseList] = useState([]);
   const [agentList, setAgentList] = useState([]);
   const [courseDetail, setCourseDetail] = useState();
   const [totalFeeToPay, setTotalFeeToPay] = useState(0);
 
-  console.log("the courseDetail", courseDetail);
+  const fetchData = async () => {
+    try {
+      const res = await axiosInstance.get("students");
+      setAdmissionCompleteList(res?.data);
+      setAdmission(
+        res?.data?.map((item) => ({
+          aNumber: item?.id,
+          Name: item?.first_name,
+          CollegeName: collegeList?.filter(
+            (res) => res?.id == item?.institute_id
+          )[0]?.name,
+          admissionDate: format(item?.created_at, "dd-MM-yyyy"),
+          course: courseList?.filter((res) => res?.id == item?.course_id)[0]
+            ?.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axiosInstance.get("students");
-        setAdmission(
-          res?.data?.map((item) => ({
-            aNumber: item?.id,
-            Name: item?.first_name,
-            CollegeName: collegeList?.filter(
-              (res) => res?.id == item?.institute_id
-            )[0]?.name,
-            admissionDate: format(item?.created_at, "dd-MM-yyyy"),
-            course: courseList?.filter((res) => res?.id == item?.course_id)[0]
-              ?.name,
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-  }, []);
+  }, [collegeList, courseList]);
 
   useEffect(() => {
     const getCollegelist = async () => {
@@ -155,7 +156,7 @@ function Onboard() {
       first_name: studentData?.first_name,
       last_name: studentData?.last_name,
       email: studentData?.email,
-      dob: "16/02/1998",
+      dob: format(dobDate, "dd-MM-yyyy"),
       course_id: admissionData?.course_id,
       gender: studentData?.gender,
       institute_id: admissionData?.institute_id,
@@ -166,12 +167,11 @@ function Onboard() {
       parent_phone_2: studentData?.parent_phone_2,
     };
     createStudent(studentPayload).then((res) => {
-      console.log("the student details", res);
       const admissionPayload = {
         student_id: res?.id,
         institute_id: admissionData?.institute_id,
         course_id: admissionData?.course_id,
-        admission_date: "2025-03-03",
+        admission_date: format(admissionDate, "yyyy-MM-dd"),
         status: admissionData?.status,
         branch_id: admissionData?.branch_id,
         agent_id: admissionData?.agent_id,
@@ -181,17 +181,8 @@ function Onboard() {
   };
 
   const getDetail = (res) => {
-    console.log("this is res", res);
     setOpen(true);
   };
-
-  console.log(
-    "the duration",
-    admissionData,
-    studentData,
-    collegeList,
-    courseList
-  );
 
   useEffect(() => {
     setTotalFeeToPay(
@@ -208,7 +199,14 @@ function Onboard() {
     );
   });
 
-  console.log("the total fee", courseDetail);
+  useEffect(() => {
+    if (admissionNumber.length) {
+      setAdmission(admission.filter((res) => res?.aNumber == admissionNumber));
+    } else {
+      fetchData();
+    }
+  }, [admissionNumber]);
+
   return (
     <div>
       <div
@@ -245,6 +243,8 @@ function Onboard() {
                 fontSize: "14px",
               },
             }}
+            value={admissionNumber}
+            onChange={(e) => setAdmissionNumber(e.target.value)}
           />
         </div>
         <div
@@ -256,7 +256,9 @@ function Onboard() {
             alignItems: "center",
           }}
         >
-          <span style={{ fontSize: "30px", fontWeight: "bold" }}>100000</span>
+          <span style={{ fontSize: "30px", fontWeight: "bold" }}>
+            {admissionCompleteList?.length}
+          </span>
           <p style={{ padding: "0px", margin: "0px", fontSize: "14px" }}>
             Total Admissions
           </p>
@@ -296,7 +298,7 @@ function Onboard() {
           <div>
             <h3>All Admissions</h3>
           </div>
-          <div
+          {/* <div
             style={{
               display: "flex",
               gap: "5px",
@@ -316,7 +318,7 @@ function Onboard() {
               5
             </span>
             <span>Per page</span>
-          </div>
+          </div> */}
         </div>
         <BasicTable
           columns={columns}
@@ -376,13 +378,14 @@ function Onboard() {
                       style={{
                         height: "40px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={admissionData?.branch_id}
                       onChange={handleAdmission}
                     >
-                      <option value="1">Mysore</option>
-                      <option value="2">Pulpalli</option>
-                      <option value="2">Sulthan Bathery</option>
+                      <option value="1">Pulpalli</option>
+                      <option value="2">Mysore</option>
+                      <option value="2">Sultan Bathery</option>
                     </select>
                   </div>
                   <div
@@ -399,6 +402,7 @@ function Onboard() {
                       style={{
                         height: "40px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={admissionData?.branch_id}
                       onChange={handleAdmission}
@@ -511,6 +515,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={studentData?.gender}
                       onChange={handleStudent}
@@ -531,6 +536,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={studentData?.religion}
                       onChange={handleStudent}
@@ -548,6 +554,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={studentData?.plus_two_stream}
                       onChange={handleStudent}
@@ -623,6 +630,25 @@ function Onboard() {
                         },
                       }}
                     />
+                    <TextField
+                      id="outlined-basic"
+                      name="address"
+                      label="Reference"
+                      variant="outlined"
+                      value={studentData?.address}
+                      onChange={handleStudent}
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                    />
                   </div>
                 </div>
                 <div>
@@ -637,6 +663,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={admissionData?.institute_id}
                       onChange={handleAdmission}
@@ -654,6 +681,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={admissionData?.course_id}
                       onChange={handleAdmission}
@@ -750,6 +778,7 @@ function Onboard() {
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
+                        borderColor: "lightgray",
                       }}
                       value={admissionData?.agent_id}
                       onChange={handleAdmission}

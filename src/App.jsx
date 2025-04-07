@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard/index";
 import ResponsiveDrawer from "./components/organisms/Layout";
 import "./App.css";
 import Onboard from "./pages/Admission/Onboard";
@@ -10,6 +10,7 @@ import Payment from "./pages/Payment/index";
 import Login from "./pages/Login";
 import PrivateRoute from "./routes/PrivateRoute";
 import Agents from "./pages/Admission/Agents";
+import Daybook from "./pages/Daybook";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/Course" element={<Course />} />
             <Route path="/Payment" element={<Payment />} />
             <Route path="/Agent" element={<Agents />} />
+            <Route path="/Daybook" element={<Daybook />} />
           </Route>
         </Route>
       </Routes>

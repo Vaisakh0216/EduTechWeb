@@ -16,19 +16,23 @@ function StudentFee() {
   const [studentFee, setStudentFee] = useState(0);
   const [collegeFee, setCollegeFee] = useState(0);
   const [transactionRow, setTransactionRow] = useState([]);
+  const [collegeTransactionRow, setCollegeTransactionRow] = useState([]);
   const [transactionDetail, setTransactionDetail] = useState({
-    amount: "",
-    description: "",
     ref: "",
-    status: "Paid",
+    description: "",
+    amount: "",
+    paymentDate: "",
+  });
+  const [collegeTransactionDetail, setCollegeTransactionDetail] = useState({
+    ref: "",
+    description: "",
+    amount: "",
+    paymentDate: "",
   });
   const [totalFee, setTotalFee] = useState(11450000);
-  const [admissionNo, setAdmissionNo] = useState("");
   const [admission, setAdmission] = useState([]);
-  const [courseFeeList, setCourseFeeList] = useState([]);
-  const [admissionDetail, setAdmissionDetail] = useState({
-    totalFee: "",
-  });
+  const [admissionDetail, setAdmissionDetail] = useState();
+  const [selectedAdmissionDetail, setSelectedAdmissionDetail] = useState();
   const columns = [
     "Admission Number",
     "Student Name",
@@ -36,19 +40,23 @@ function StudentFee() {
     "Date",
     "Course",
   ];
+  const [dateOfPayment, setDateOfPayment] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await listAdmissions();
-        console.log("sssss", res);
+        setAdmissionDetail(res);
         setAdmission(
           res?.map((item) => ({
             aNumber: item?.id,
-            Name: item?.student?.first_name,
+            Name: item?.student?.first_name.concat(
+              " ",
+              item?.student?.last_name
+            ),
             CollegeName: item?.institute?.name,
+            course: item?.course?.name,
             admissionDate: item?.admission_date,
-            course: item?.course_id,
           }))
         );
       } catch (error) {
@@ -56,37 +64,56 @@ function StudentFee() {
       }
     };
 
-    const getCourseFeeList = async () => {
-      try {
-        const res = await listCourseFee();
-        setCourseFeeList(res);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
-    getCourseFeeList();
   }, []);
 
-  const TransactionHead = ["Transaction Id", "Description", "Amount", "Status"];
+  const TransactionHead = ["Transaction Id", "Description", "Amount", "Date"];
 
   const saveTransation = () => {
     setTransactionRow((prev) => [...prev, transactionDetail]);
   };
 
+  const saveCollegeTransation = () => {
+    setCollegeTransactionRow((prev) => [...prev, collegeTransactionDetail]);
+  };
+
+  const calculateTotalFee = () => {
+    return (
+      (Number(selectedAdmissionDetail?.course_fee?.admission_fee) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_1) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_2) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_3) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_4) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_5) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.hostel_term_6) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.service_charge) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_1) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_2) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_3) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_4) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_5) || 0) +
+      (Number(selectedAdmissionDetail?.course_fee?.tuition_term_6) || 0)
+    );
+  };
+
   const getDetail = (val) => {
-    console.log("this is val", val);
     setOpen(true);
-    console.log(
-      "this is courseFees",
-      courseFeeList?.data?.filter((res) => res?.course_id == val?.course)
+    setSelectedAdmissionDetail(
+      admissionDetail?.filter((res) => res?.id == val?.aNumber)[0]
     );
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTransactionDetail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleCollegeChange = (e) => {
+    const { name, value } = e.target;
+    setCollegeTransactionDetail((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -159,7 +186,7 @@ function StudentFee() {
                         padding: 5,
                       }}
                     >
-                      {admissionNo}
+                      {selectedAdmissionDetail?.id}
                     </span>
                   </div>
                   <div
@@ -188,7 +215,7 @@ function StudentFee() {
                         padding: 5,
                       }}
                     >
-                      {totalFee}
+                      {calculateTotalFee()}
                     </span>
                   </div>
                 </div>
@@ -214,16 +241,20 @@ function StudentFee() {
                         fontSize: "14px",
                         fontWeight: "normal",
                         padding: `${
-                          totalFee === studentFee ? "5px 10px" : "4px"
+                          calculateTotalFee() == studentFee ? "5px 10px" : "4px"
                         }`,
-                        color: `${totalFee === studentFee ? "white" : "black"}`,
+                        color: `${
+                          calculateTotalFee() === studentFee ? "white" : "black"
+                        }`,
                         backgroundColor: `${
-                          totalFee === studentFee ? "lightgreen" : ""
+                          calculateTotalFee() == studentFee ? "lightgreen" : ""
                         }`,
-                        borderRadius: `${totalFee === studentFee ? "5px" : ""}`,
+                        borderRadius: `${
+                          calculateTotalFee() == studentFee ? "5px" : ""
+                        }`,
                       }}
                     >
-                      {totalFee === studentFee ? "Paid" : studentFee}
+                      {calculateTotalFee() == studentFee ? "Paid" : studentFee}
                     </h3>
                   </div>
                 </div>
@@ -257,12 +288,6 @@ function StudentFee() {
                           marginTop: "10px",
                         }}
                       >
-                        <DatePicker
-                          className="dob-datepicker"
-                          // selected={dobDate}
-                          // onChange={(date) => setDobDate(date)}
-                          placeholderText="DD-MM-YYYY"
-                        />
                         <TextField
                           id="outlined-basic"
                           name="ref"
@@ -282,24 +307,27 @@ function StudentFee() {
                           }}
                           onChange={(e) => handleChange(e)}
                         />
-                        <TextField
-                          id="outlined-basic"
+
+                        <select
+                          id="my-select"
                           name="description"
-                          label="Description"
-                          variant="outlined"
-                          autoComplete="off"
-                          style={{ width: "100%" }}
-                          sx={{
-                            "& .MuiInputBase-root": {
-                              height: "50px",
-                              borderRadius: "8px",
-                            },
-                            "& .MuiInputLabel-root": {
-                              top: "-2px",
-                              fontSize: "14px",
-                            },
+                          style={{
+                            height: "50px",
+                            borderRadius: "8px",
+                            width: "100%",
                           }}
                           onChange={(e) => handleChange(e)}
+                        >
+                          <option value="">Select Payment Mode</option>
+                          <option value="Cash">Cash</option>
+                          <option value="Gpay">Gpay</option>
+                          <option value="Check">Check</option>
+                        </select>
+                        <DatePicker
+                          className="paymentDate"
+                          selected={dateOfPayment}
+                          onChange={(date) => setDateOfPayment(date)}
+                          placeholderText="DD-MM-YYYY"
                         />
                         <TextField
                           id="outlined-basic"
@@ -335,128 +363,132 @@ function StudentFee() {
                     )}
                   </Stack>
                 </div>
-                <div style={{ marginTop: "50px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignContent: "center",
-                      gap: "5px",
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: "14px",
-                        backgroundColor: "lightgray",
-                        padding: "4px",
-                      }}
-                    >
-                      Fee to Paid to Collected:
-                    </h3>
-                    <h3
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "normal",
-                        padding: "4px",
-                      }}
-                    >
-                      {totalFee === studentFee ? "Paid Completely" : studentFee}
-                    </h3>
-                  </div>
-                  <div style={{ border: "1px solid gray", padding: "5px" }}>
+                {studentFee > 0 && (
+                  <div style={{ marginTop: "50px" }}>
                     <div
                       style={{
                         display: "flex",
-                        justifyContent: "space-between",
-                        borderBottom: "1px solid gray",
+                        alignContent: "center",
+                        gap: "5px",
                       }}
                     >
-                      <h3 style={{ fontSize: "16px" }}>Paid To College</h3>
+                      <h3
+                        style={{
+                          fontSize: "14px",
+                          backgroundColor: "lightgray",
+                          padding: "4px",
+                        }}
+                      >
+                        Fee Paid to College:
+                      </h3>
+                      <h3
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "normal",
+                          padding: "4px",
+                        }}
+                      >
+                        {totalFee === studentFee
+                          ? "Paid Completely"
+                          : studentFee}
+                      </h3>
                     </div>
-                    <Stack style={{}}>
-                      <BasicTable
-                        columns={TransactionHead}
-                        rows={transactionRow}
-                        onClickFunction={getDetail}
-                      />
+                    <div style={{ border: "1px solid gray", padding: "5px" }}>
                       <div
                         style={{
                           display: "flex",
-                          gap: "5px",
-                          marginTop: "10px",
+                          justifyContent: "space-between",
+                          borderBottom: "1px solid gray",
                         }}
                       >
-                        <TextField
-                          id="outlined-basic"
-                          name="ref"
-                          label="Transation Ref"
-                          variant="outlined"
-                          autoComplete="off"
-                          style={{ width: "100%" }}
-                          sx={{
-                            "& .MuiInputBase-root": {
-                              height: "50px",
-                              borderRadius: "8px",
-                            },
-                            "& .MuiInputLabel-root": {
-                              top: "-2px",
-                              fontSize: "14px",
-                            },
-                          }}
-                          onChange={(e) => handleChange(e)}
-                        />
-                        <TextField
-                          id="outlined-basic"
-                          name="description"
-                          label="Description"
-                          variant="outlined"
-                          autoComplete="off"
-                          style={{ width: "100%" }}
-                          sx={{
-                            "& .MuiInputBase-root": {
-                              height: "50px",
-                              borderRadius: "8px",
-                            },
-                            "& .MuiInputLabel-root": {
-                              top: "-2px",
-                              fontSize: "14px",
-                            },
-                          }}
-                          onChange={(e) => handleChange(e)}
-                        />
-                        <TextField
-                          id="outlined-basic"
-                          name="amount"
-                          label="Amount"
-                          variant="outlined"
-                          autoComplete="off"
-                          style={{ width: "100%" }}
-                          sx={{
-                            "& .MuiInputBase-root": {
-                              height: "50px",
-                              borderRadius: "8px",
-                            },
-                            "& .MuiInputLabel-root": {
-                              top: "-2px",
-                              fontSize: "14px",
-                            },
-                          }}
-                          onChange={(e) => handleChange(e)}
-                        />
-                        <Button
-                          variant="contained"
-                          style={{
-                            height: "50px",
-                            borderRadius: "8px",
-                            textTransform: "inherit",
-                          }}
-                          onClick={() => saveTransation()}
-                        >
-                          Save
-                        </Button>
+                        <h3 style={{ fontSize: "16px" }}>Paid To College</h3>
                       </div>
-                    </Stack>
+                      <Stack style={{}}>
+                        <BasicTable
+                          columns={TransactionHead}
+                          rows={collegeTransactionRow}
+                          onClickFunction={getDetail}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "5px",
+                            marginTop: "10px",
+                          }}
+                        >
+                          <TextField
+                            id="outlined-basic"
+                            name="ref"
+                            label="Transation Ref"
+                            variant="outlined"
+                            autoComplete="off"
+                            style={{ width: "100%" }}
+                            sx={{
+                              "& .MuiInputBase-root": {
+                                height: "50px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-2px",
+                                fontSize: "14px",
+                              },
+                            }}
+                            onChange={(e) => handleCollegeChange(e)}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            name="description"
+                            label="Description"
+                            variant="outlined"
+                            autoComplete="off"
+                            style={{ width: "100%" }}
+                            sx={{
+                              "& .MuiInputBase-root": {
+                                height: "50px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-2px",
+                                fontSize: "14px",
+                              },
+                            }}
+                            onChange={(e) => handleCollegeChange(e)}
+                          />
+                          <TextField
+                            id="outlined-basic"
+                            name="amount"
+                            label="Amount"
+                            variant="outlined"
+                            autoComplete="off"
+                            style={{ width: "100%" }}
+                            sx={{
+                              "& .MuiInputBase-root": {
+                                height: "50px",
+                                borderRadius: "8px",
+                              },
+                              "& .MuiInputLabel-root": {
+                                top: "-2px",
+                                fontSize: "14px",
+                              },
+                            }}
+                            onChange={(e) => handleCollegeChange(e)}
+                          />
+                          <Button
+                            variant="contained"
+                            style={{
+                              height: "50px",
+                              borderRadius: "8px",
+                              textTransform: "inherit",
+                            }}
+                            onClick={() => saveCollegeTransation()}
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </Stack>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           }

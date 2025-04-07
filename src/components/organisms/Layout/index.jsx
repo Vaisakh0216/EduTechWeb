@@ -22,6 +22,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
 import logo from "../../../assets/Logo.png";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const drawerWidth = 280;
 
@@ -62,6 +63,10 @@ function ResponsiveDrawer(props) {
     {
       key: "Payment",
       icon: <CurrencyRupeeIcon style={{ color: "white" }} />,
+    },
+    {
+      key: "Daybook",
+      icon: <ManageAccountsIcon style={{ color: "white" }} />,
     },
   ];
 
