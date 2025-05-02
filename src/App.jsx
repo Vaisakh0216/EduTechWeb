@@ -11,6 +11,8 @@ import Login from "./pages/Login";
 import PrivateRoute from "./routes/PrivateRoute";
 import Agents from "./pages/Admission/Agents";
 import Daybook from "./pages/Daybook";
+import Cashbook from "./pages/Cashbook";
+import AgentDetail from "./pages/Agent/agentDetail";
 
 function App() {
   return (
@@ -20,12 +22,14 @@ function App() {
         <Route element={<ResponsiveDrawer />}>
           <Route element={<PrivateRoute />}>
             <Route path="/Dashboard" element={<Dashboard />} />
-            <Route path="/Onboard" element={<Onboard />} />
+            <Route path="/Admission" element={<Onboard />} />
             <Route path="/College" element={<College />} />
             <Route path="/Course" element={<Course />} />
             <Route path="/Payment" element={<Payment />} />
             <Route path="/Agent" element={<Agents />} />
+            <Route path="/Agent/:id" element={<AgentDetail />} />
             <Route path="/Daybook" element={<Daybook />} />
+            <Route path="/Cashbook" element={<Cashbook />} />
           </Route>
         </Route>
       </Routes>

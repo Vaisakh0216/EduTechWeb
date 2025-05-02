@@ -78,9 +78,9 @@ function Dashboard() {
         <Grid2 lg={8} xs={12}>
           <InflationChart />
         </Grid2>
-        <Grid2 lg={4} md={6} xs={12}>
+        {/* <Grid2 lg={4} md={6} xs={12}>
           <FinancialOverview />
-        </Grid2>
+        </Grid2> */}
       </Grid2>
     </div>
   );

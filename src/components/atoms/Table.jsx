@@ -62,7 +62,7 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
             {/* <TableCell style={{ fontWeight: "bold" }} align="center">
               S/N
             </TableCell> */}
-            {columns.map((col, index) => (
+            {columns?.map((col, index) => (
               <TableCell
                 key={index}
                 align="center"
@@ -77,12 +77,12 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row, rowIndex) => (
+          {rows?.map((row, rowIndex) => (
             // Use a unique key for each row, assuming row.id is unique
             <TableRow
               key={row.id || rowIndex}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              onClick={() => onClickFunction(row)}
+              onClick={() => onClickFunction(row, rowIndex)}
             >
               {/* <TableCell component="td" align="center">
                 {rowIndex + 1}

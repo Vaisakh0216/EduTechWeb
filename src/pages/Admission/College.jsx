@@ -175,7 +175,7 @@ function College() {
     const payload = {
       course_id: courseDetail?.course_id,
       institute_id: selectedCollege?.id,
-      admission_fee: courseDetail?.admission_fee,
+      admission_fee: courseDetail?.service_charge,
       service_charge: courseDetail?.service_charge,
       ...Object.keys(tutionFee).reduce((acc, key) => {
         acc[key] = tutionFee[key];

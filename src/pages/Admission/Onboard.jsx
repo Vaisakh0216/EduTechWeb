@@ -1,20 +1,19 @@
-import { Button, Checkbox, TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import BasicTable from "../../components/atoms/Table";
 import Drawer from "../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import DeleteIcon from "@mui/icons-material/Delete";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import axiosInstance from "../../config/axiosConfig";
 import { listColleges } from "../../services/listColleges";
 import { listAgents } from "../../services/listAgents";
 import { createStudent } from "../../services/createStudent";
 import { createAdmission } from "../../services/createAdmission";
 import { listCourses } from "../../services/listCourses";
-import moment from "moment";
 import { format } from "date-fns";
+import { listAdmissions } from "../../services/listAdmissions";
+import { createAgentFee } from "../../services/createAgentFee";
+import { updateCourseFee } from "../../services/updateCourseFee";
 
 function Onboard() {
   const [open, setOpen] = useState(false);
@@ -43,6 +42,7 @@ function Onboard() {
     address: "",
     institute_id: "",
     course_id: "",
+    reference: "",
   });
   const [admissionData, setAdmissionData] = useState({
     student_id: "",
@@ -51,6 +51,26 @@ function Onboard() {
     status: "pending",
     branch_id: "1",
     agent_id: "",
+  });
+  const [agentFeelist, setAgentFeelist] = useState({
+    main: {
+      admission_id: "",
+      agent_id: "",
+      amount: "",
+      status: "pending",
+    },
+    sub: {
+      admission_id: "",
+      agent_id: "",
+      amount: "",
+      status: "pending",
+    },
+    college: {
+      admission_id: "",
+      agent_id: "",
+      amount: "",
+      status: "pending",
+    },
   });
   const [admissionDate, setAdmissionDate] = useState(new Date());
   const [dobDate, setDobDate] = useState(new Date());
@@ -62,18 +82,15 @@ function Onboard() {
 
   const fetchData = async () => {
     try {
-      const res = await axiosInstance.get("students");
+      const res = await listAdmissions();
       setAdmissionCompleteList(res?.data);
       setAdmission(
         res?.data?.map((item) => ({
           aNumber: item?.id,
-          Name: item?.first_name,
-          CollegeName: collegeList?.filter(
-            (res) => res?.id == item?.institute_id
-          )[0]?.name,
-          admissionDate: format(item?.created_at, "dd-MM-yyyy"),
-          course: courseList?.filter((res) => res?.id == item?.course_id)[0]
-            ?.name,
+          Name: item?.student?.first_name,
+          CollegeName: item?.institute?.name,
+          admissionDate: format(item?.admission_date, "dd-MM-yyyy"),
+          course: item?.course?.name,
         }))
       );
     } catch (error) {
@@ -110,7 +127,7 @@ function Onboard() {
     const getAgentlist = async () => {
       try {
         const res = await listAgents();
-        setAgentList(res?.data);
+        setAgentList(res);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -134,6 +151,16 @@ function Onboard() {
     }));
   };
 
+  const handleChange = (section, field, value) => {
+    setAgentFeelist((prevState) => ({
+      ...prevState,
+      [section]: {
+        ...prevState[section],
+        [field]: value,
+      },
+    }));
+  };
+
   useEffect(() => {
     setCourseDetail(
       collegeList
@@ -152,42 +179,109 @@ function Onboard() {
   );
 
   const handleSubmit = () => {
-    const studentPayload = {
-      first_name: studentData?.first_name,
-      last_name: studentData?.last_name,
-      email: studentData?.email,
-      dob: format(dobDate, "dd-MM-yyyy"),
-      course_id: admissionData?.course_id,
-      gender: studentData?.gender,
-      institute_id: admissionData?.institute_id,
-      phone: studentData?.phone,
-      religion: studentData?.religion,
-      plus_two_stream: studentData?.plus_two_stream,
-      parent_phone_1: studentData?.parent_phone_1,
-      parent_phone_2: studentData?.parent_phone_2,
-    };
-    createStudent(studentPayload).then((res) => {
+    const { id, ...rest } = courseDetail;
+    updateCourseFee(rest, id).then((res) => {
       const admissionPayload = {
-        student_id: res?.id,
-        institute_id: admissionData?.institute_id,
+        first_name: studentData?.first_name,
+        last_name: studentData?.last_name,
+        email: studentData?.email,
+        dob: format(dobDate, "dd-MM-yyyy"),
+        academic_year: "2025",
         course_id: admissionData?.course_id,
+        institute_id: admissionData?.institute_id,
+        gender: studentData?.gender,
         admission_date: format(admissionDate, "yyyy-MM-dd"),
+        phone: studentData?.phone,
+        religion: studentData?.religion,
+        plus_two_stream: studentData?.plus_two_stream,
+        parent_phone_1: studentData?.parent_phone_1,
+        parent_phone_2: studentData?.parent_phone_2,
+        "agents[0][id]": agentFeelist["main"]?.agent_id,
+        "agents[0][fee]": agentFeelist["main"]?.amount,
+        "agents[1][id]": agentFeelist["sub"]?.agent_id,
+        "agents[1][fee]": agentFeelist["sub"]?.amount,
+        "agents[2][id]": agentFeelist["college"]?.agent_id,
+        "agents[2][fee]": agentFeelist["college"]?.amount,
         status: admissionData?.status,
         branch_id: admissionData?.branch_id,
-        agent_id: admissionData?.agent_id,
+        ref_platform: studentData?.reference,
+        address: studentData?.address,
       };
-      createAdmission(admissionPayload);
+
+      console.log("this is admissionPayload", admissionPayload);
+      createAdmission(admissionPayload).then((res) => {
+        fetchData();
+        setOpen(false);
+      });
+      // const studentPayload = {
+      // first_name: studentData?.first_name,
+      // last_name: studentData?.last_name,
+      // email: studentData?.email,
+      // dob: format(dobDate, "dd-MM-yyyy"),
+      //   course_id: admissionData?.course_id,
+      //   gender: studentData?.gender,
+      //   institute_id: admissionData?.institute_id,
+      // phone: studentData?.phone,
+      // religion: studentData?.religion,
+      // plus_two_stream: studentData?.plus_two_stream,
+      // parent_phone_1: studentData?.parent_phone_1,
+      // parent_phone_2: studentData?.parent_phone_2,
+      // };
+      // createStudent(studentPayload).then((res) => {
+      //   const admissionPayload = {
+      //     student_id: res?.id,
+      //     institute_id: admissionData?.institute_id,
+      //     course_id: admissionData?.course_id,
+
+      // status: admissionData?.status,
+      // branch_id: admissionData?.branch_id,
+      //     agent_id: agentFeelist["main"]?.agent_id,
+      //   };
+      //   createAdmission(admissionPayload).then((res) => {
+      //     if (res?.id) {
+      //       setAgentFeelist((prev) => {
+      //         const updated = {
+      //           main: {
+      //             ...prev.main,
+      //             admission_id: res.id,
+      //           },
+      //           sub: {
+      //             ...prev.sub,
+      //             admission_id: res.id,
+      //           },
+      //           college: {
+      //             ...prev.college,
+      //             admission_id: res.id,
+      //           },
+      //         };
+
+      //         createAgentFee(updated.main).then((res) =>
+      //           console.log("Main Fee Response", res)
+      //         );
+      //         createAgentFee(updated.sub).then((res) =>
+      //           console.log("Sub Fee Response", res)
+      //         );
+      //         createAgentFee(updated.college).then((res) =>
+      //           console.log("College Fee Response", res)
+      //         );
+
+      //         return updated;
+      //       });
+      //     }
+      //   });
+      // });
     });
   };
 
   const getDetail = (res) => {
     setOpen(true);
+    console.log("this is res", res);
   };
 
   useEffect(() => {
     setTotalFeeToPay(
-      (Number(courseDetail?.admission_fee) || 0) +
-        (Number(courseDetail?.hostel_term_1) || 0) +
+      // (Number(courseDetail?.admission_fee) || 0) +
+      (Number(courseDetail?.hostel_term_1) || 0) +
         (Number(courseDetail?.hostel_term_2) || 0) +
         (Number(courseDetail?.hostel_term_3) || 0) +
         (Number(courseDetail?.hostel_term_4) || 0) +
@@ -206,6 +300,14 @@ function Onboard() {
       fetchData();
     }
   }, [admissionNumber]);
+
+  const handleCourseDetailChange = (e) => {
+    const { name, value } = e.target;
+    setCourseDetail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <div>
@@ -578,6 +680,7 @@ function Onboard() {
                       onChange={handleStudent}
                       sx={{
                         width: "100%",
+                        zIndex: 0,
                         "& .MuiInputBase-root": {
                           height: "45px",
                           borderRadius: "8px",
@@ -597,6 +700,7 @@ function Onboard() {
                       onChange={handleStudent}
                       sx={{
                         width: "100%",
+                        zIndex: 0,
                         "& .MuiInputBase-root": {
                           height: "45px",
                           borderRadius: "8px",
@@ -632,10 +736,10 @@ function Onboard() {
                     />
                     <TextField
                       id="outlined-basic"
-                      name="address"
+                      name="reference"
                       label="Reference"
                       variant="outlined"
-                      value={studentData?.address}
+                      value={studentData?.reference}
                       onChange={handleStudent}
                       sx={{
                         width: "100%",
@@ -717,6 +821,7 @@ function Onboard() {
                                   ? courseDetail?.[`tuition_term_${index + 1}`]
                                   : ""
                               }
+                              onChange={handleCourseDetailChange}
                               sx={{
                                 width: "100%",
                                 "& .MuiInputBase-root": {
@@ -753,6 +858,7 @@ function Onboard() {
                                   ? courseDetail?.[`hostel_term_${index + 1}`]
                                   : ""
                               }
+                              onChange={handleCourseDetailChange}
                               sx={{
                                 width: "100%",
                                 "& .MuiInputBase-root": {
@@ -773,20 +879,25 @@ function Onboard() {
                   >
                     <select
                       id="my-select"
-                      name="agent_id"
                       style={{
                         width: "100%",
                         height: "45px",
                         borderRadius: "8px",
                         borderColor: "lightgray",
                       }}
-                      value={admissionData?.agent_id}
-                      onChange={handleAdmission}
+                      value={agentFeelist.main.agent_id}
+                      onChange={(e) =>
+                        handleChange("main", "agent_id", e.target.value)
+                      }
                     >
-                      <option value="">Select Aent</option>
-                      {agentList?.map((agent, index) => (
-                        <option value={index + 1}>{agent?.name}</option>
-                      ))}
+                      <option value="">Select Main Aent</option>
+                      {agentList
+                        ?.filter((main) => main?.agent_type === "Main")
+                        .map((res, index) => (
+                          <option key={index} value={index + 1}>
+                            {res?.name}
+                          </option>
+                        ))}
                     </select>
                     <TextField
                       id="outlined-basic"
@@ -803,6 +914,104 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      value={agentFeelist.main.amount}
+                      onChange={(e) =>
+                        handleChange("main", "amount", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div
+                    style={{ display: "flex", gap: "10px", marginTop: "10px" }}
+                  >
+                    <select
+                      id="my-select"
+                      name="agent_id"
+                      style={{
+                        width: "100%",
+                        height: "45px",
+                        borderRadius: "8px",
+                        borderColor: "lightgray",
+                      }}
+                      value={agentFeelist.sub.agent_id}
+                      onChange={(e) =>
+                        handleChange("sub", "agent_id", e.target.value)
+                      }
+                    >
+                      <option value="">Select Sub Aent</option>
+                      {agentList
+                        ?.filter((main) => main?.agent_type === "Sub")
+                        .map((res, index) => (
+                          <option key={index} value={index + 1}>
+                            {res?.name}
+                          </option>
+                        ))}
+                    </select>
+                    <TextField
+                      id="outlined-basic"
+                      label="Agent Fee"
+                      variant="outlined"
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                      value={agentFeelist.sub.amount}
+                      onChange={(e) =>
+                        handleChange("sub", "amount", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div
+                    style={{ display: "flex", gap: "10px", marginTop: "10px" }}
+                  >
+                    <select
+                      id="my-select"
+                      name="agent_id"
+                      style={{
+                        width: "100%",
+                        height: "45px",
+                        borderRadius: "8px",
+                        borderColor: "lightgray",
+                      }}
+                      value={agentFeelist.college.agent_id}
+                      onChange={(e) =>
+                        handleChange("college", "agent_id", e.target.value)
+                      }
+                    >
+                      <option value="">Select College Aent</option>
+                      {agentList
+                        ?.filter((main) => main?.agent_type === "College")
+                        .map((res, index) => (
+                          <option key={index} value={index + 1}>
+                            {res?.name}
+                          </option>
+                        ))}
+                    </select>
+                    <TextField
+                      id="outlined-basic"
+                      label="Agent Fee"
+                      variant="outlined"
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": {
+                          height: "45px",
+                          borderRadius: "8px",
+                        },
+                        "& .MuiInputLabel-root": {
+                          top: "-5px",
+                          fontSize: "14px",
+                        },
+                      }}
+                      value={agentFeelist.college.amount}
+                      onChange={(e) =>
+                        handleChange("college", "amount", e.target.value)
+                      }
                     />
                   </div>
                 </div>

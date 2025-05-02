@@ -23,6 +23,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import logo from "../../../assets/Logo.png";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import college from "../../../assets/college.svg";
+import admission from "../../../assets/admission.svg";
+import agent from "../../../assets/agent.svg";
+import course from "../../../assets/course.svg";
 
 const drawerWidth = 280;
 
@@ -57,8 +62,20 @@ function ResponsiveDrawer(props) {
       icon: <DashboardIcon style={{ color: "white" }} />,
     },
     {
-      key: <CustomAccordion />,
-      icon: <SchoolIcon style={{ color: "white" }} />,
+      key: "Admission",
+      icon: <img src={admission} width={25} height={25} />,
+    },
+    {
+      key: "Agent",
+      icon: <img src={agent} width={20} height={20} />,
+    },
+    {
+      key: "College",
+      icon: <img src={college} width={20} height={20} />,
+    },
+    {
+      key: "Course",
+      icon: <img src={course} width={20} height={20} />,
     },
     {
       key: "Payment",
@@ -66,6 +83,10 @@ function ResponsiveDrawer(props) {
     },
     {
       key: "Daybook",
+      icon: <MenuBookIcon style={{ color: "white" }} />,
+    },
+    {
+      key: "Cashbook",
       icon: <ManageAccountsIcon style={{ color: "white" }} />,
     },
   ];

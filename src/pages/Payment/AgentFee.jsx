@@ -8,6 +8,9 @@ import { listAgents } from "../../services/listAgents";
 import Drawer from "../../components/atoms/Drawer";
 import { Button, Stack, TextField } from "@mui/material";
 import DatePicker from "react-datepicker";
+import { format } from "date-fns";
+import { createTransaction } from "../../services/createTransaction";
+import { getAdmissionTransaction } from "../../services/getFeeTransactionByAdmission";
 
 function AgentFee() {
   const [open, setOpen] = useState(false);
@@ -22,12 +25,32 @@ function AgentFee() {
     "Date",
     "Course",
   ];
-  const TransactionHead = ["Transaction Id", "Description", "Amount", "Date"];
-  const getAgentNames = (agentFees, agents) => {
-    return agentFees.map((fee) => {
-      const agent = agents.find((a) => a.id === fee?.agent_id);
-      return agent ? agent.name : "Agent Not Found";
-    });
+  const [transactionDetail, setTransactionDetail] = useState({
+    type: "",
+    category: "",
+    description: "",
+    transaction_date: "",
+    reference_id: "",
+    amount: "",
+    mode_of_payment: "",
+    category_id: "",
+  });
+  const TransactionHead = [
+    "Transaction Id",
+    "Mode Of Payment",
+    "Amount",
+    "Date",
+  ];
+  const [dateOfPayment, setDateOfPayment] = useState();
+  const [transactionRow, setTransactionRow] = useState([]);
+  const [selectedAdmissionNumber, setSelectedAdmissionNumber] = useState();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTransactionDetail((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -47,9 +70,10 @@ function AgentFee() {
     const fetchAdmission = async () => {
       try {
         const res = await listAdmissions();
-        setAdmissionList(res);
+        console.log("this is res", res);
+        setAdmissionList(res?.data);
         setAdmission(
-          res?.map((item) => ({
+          res?.data?.map((item) => ({
             aNumber: item?.id,
             Name: item?.student?.first_name.concat(
               " ",
@@ -70,7 +94,69 @@ function AgentFee() {
 
   const getDetails = (val) => {
     setOpen(true);
+    setSelectedAdmissionNumber(val?.aNumber);
     setagentDetails(admissionList?.filter((res) => res?.id == val?.aNumber)[0]);
+    console.log(
+      "ddddd",
+      admissionList
+        ?.filter((res) => res?.id == val?.aNumber)[0]
+        ?.agent_fees?.map((res) =>
+          // getAdmissionTransaction(res?.agent_id).then((res) => {
+          //   setTransactionRow((prev) => [
+          //     ...prev,
+          //     res?.data
+          //       ?.filter((item) => item?.type == "debit")
+          //       .map((item) => ({
+          //         agent: res?.agent_id,
+          //         ref: item?.id,
+          //         mode_of_payment: item?.mode_of_payment,
+          //         amount: item?.amount,
+          //         paymentDate: item?.transaction_date,
+          //       })),
+          //   ]);
+          // })
+
+          getAdmissionTransaction(res?.agent_id).then((res) => {
+            const debitTransactions = res?.data
+              ?.filter((item) => item?.type === "debit")
+              .map((item) => ({
+                ref: item?.id,
+                mode_of_payment: item?.mode_of_payment,
+                amount: item?.amount,
+                paymentDate: item?.transaction_date,
+              }));
+
+            setTransactionRow((prev) => [...prev, ...debitTransactions]);
+          })
+        )
+    );
+  };
+
+  const saveTransation = () => {
+    const payload = {
+      type: "debit",
+      category: "Admissions",
+      description: "Agent fee",
+      transaction_date: format(dateOfPayment, "yyyy-MM-dd"),
+      reference_id: agentDetails?.agent_id,
+      amount: transactionDetail?.amount,
+      mode_of_payment: transactionDetail?.mode_of_payment,
+      category_id: 1,
+    };
+    createTransaction(payload).then((res) => {
+      getAdmissionTransaction(selectedAdmissionNumber).then((res) => {
+        setTransactionRow(
+          res?.data
+            ?.filter((item) => item?.type == "debit")
+            .map((item) => ({
+              ref: item?.description,
+              mode_of_payment: item?.mode_of_payment,
+              amount: item?.amount,
+              paymentDate: item?.transaction_date,
+            }))
+        );
+      });
+    });
   };
 
   console.log("this is agent detail", agentDetails);
@@ -139,7 +225,10 @@ function AgentFee() {
                       </div>
                       <div style={{ border: "1px solid gray", padding: "5px" }}>
                         <Stack style={{}}>
-                          <BasicTable columns={TransactionHead} rows={[]} />
+                          <BasicTable
+                            columns={TransactionHead}
+                            rows={transactionRow}
+                          />
                           {agent?.amount > 0 && (
                             <div
                               style={{
@@ -165,18 +254,18 @@ function AgentFee() {
                                     fontSize: "14px",
                                   },
                                 }}
-                                // onChange={(e) => handleChange(e)}
+                                onChange={(e) => handleChange(e)}
                               />
 
                               <select
                                 id="my-select"
-                                name="description"
+                                name="mode_of_payment"
                                 style={{
                                   height: "50px",
                                   borderRadius: "8px",
                                   width: "100%",
                                 }}
-                                // onChange={(e) => handleChange(e)}
+                                onChange={(e) => handleChange(e)}
                               >
                                 <option value="">Select Payment Mode</option>
                                 <option value="Cash">Cash</option>
@@ -185,8 +274,8 @@ function AgentFee() {
                               </select>
                               <DatePicker
                                 className="paymentDate"
-                                // selected={dateOfPayment}
-                                // onChange={(date) => setDateOfPayment(date)}
+                                selected={dateOfPayment}
+                                onChange={(date) => setDateOfPayment(date)}
                                 placeholderText="DD-MM-YYYY"
                               />
                               <TextField
@@ -206,7 +295,7 @@ function AgentFee() {
                                     fontSize: "14px",
                                   },
                                 }}
-                                // onChange={(e) => handleChange(e)}
+                                onChange={(e) => handleChange(e)}
                               />
                               <Button
                                 variant="contained"
@@ -215,7 +304,7 @@ function AgentFee() {
                                   borderRadius: "8px",
                                   textTransform: "inherit",
                                 }}
-                                // onClick={() => saveTransation()}
+                                onClick={() => saveTransation()}
                               >
                                 Save
                               </Button>

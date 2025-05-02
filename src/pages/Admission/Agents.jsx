@@ -10,8 +10,10 @@ import { listUniversities } from "../../services/listUniversities";
 import { listAgents } from "../../services/listAgents";
 import { createAgent } from "../../services/createAgent";
 import CreateIcon from "@mui/icons-material/Create";
+import { useNavigate } from "react-router-dom";
 
 function Agents() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [agentName, setAgentName] = useState("");
   const [agentType, setAgentType] = useState("");
@@ -25,6 +27,7 @@ function Agents() {
   });
   const [loading, setLoading] = useState(false);
   const [agentList, setAgentList] = useState([]);
+  const [completeAgentList, setCompleteAgentList] = useState([]);
   const [createOrEdit, setCreateOrEdit] = useState("");
   const [selectedAgent, setSelectedAgent] = useState();
   const columns = ["Agent Name", "Agent Type", "Contact Number", "Agent Fee"];
@@ -83,13 +86,16 @@ function Agents() {
 
   const getAgentlist = () => {
     listAgents().then((res) => {
+      setCompleteAgentList(res);
       setAgentList(
-        res?.data?.map((item) => {
+        res?.map((item) => {
           return {
             name: item?.name,
             agent_type: item?.agent_type,
             contact_number: item?.contact_number,
-            agent_fee: "0",
+            agent_fee: item?.agent_fees?.reduce((sum, val) => {
+              return sum + Number(val?.amount);
+            }, 0),
           };
         })
       );
@@ -100,11 +106,12 @@ function Agents() {
     getAgentlist();
   }, []);
 
-  const getAgentDetail = (res) => {
-    console.log("theres", res);
+  const getAgentDetail = (res, rowIndex) => {
+    console.log("theres", completeAgentList[rowIndex]);
     setOpen(true);
     setSelectedAgent(res);
-    setCreateOrEdit("detail");
+    // setCreateOrEdit("detail");
+    navigate(`/Agent/${completeAgentList[rowIndex]?.id}`);
   };
 
   return (

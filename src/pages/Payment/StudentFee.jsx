@@ -10,29 +10,44 @@ import axiosInstance from "../../config/axiosConfig";
 import { listCourseFee } from "../../services/listCourseFee";
 import { listAdmissions } from "../../services/listAdmissions";
 import DatePicker from "react-datepicker";
+import { getAdmissionTransaction } from "../../services/getFeeTransactionByAdmission";
+import { format } from "date-fns";
+import { createTransaction } from "../../services/createTransaction";
+import GppMaybeIcon from "@mui/icons-material/GppMaybe";
 
 function StudentFee() {
+  const TransactionHead = ["Transaction Id", "Description", "Amount", "Date"];
   const [open, setOpen] = useState(false);
   const [studentFee, setStudentFee] = useState(0);
   const [collegeFee, setCollegeFee] = useState(0);
   const [transactionRow, setTransactionRow] = useState([]);
   const [collegeTransactionRow, setCollegeTransactionRow] = useState([]);
   const [transactionDetail, setTransactionDetail] = useState({
-    ref: "",
+    type: "",
+    category: "",
     description: "",
+    transaction_date: "",
+    reference_id: "",
     amount: "",
-    paymentDate: "",
+    mode_of_payment: "",
+    category_id: "",
   });
+  const [transactions, setTransactions] = useState([]);
   const [collegeTransactionDetail, setCollegeTransactionDetail] = useState({
-    ref: "",
+    type: "",
+    category: "",
     description: "",
+    transaction_date: "",
+    reference_id: "",
     amount: "",
-    paymentDate: "",
+    mode_of_payment: "",
+    category_id: "",
   });
-  const [totalFee, setTotalFee] = useState(11450000);
+  const [totalFee, setTotalFee] = useState();
   const [admission, setAdmission] = useState([]);
   const [admissionDetail, setAdmissionDetail] = useState();
   const [selectedAdmissionDetail, setSelectedAdmissionDetail] = useState();
+  const [feeCollected, setFeeCollected] = useState();
   const columns = [
     "Admission Number",
     "Student Name",
@@ -41,6 +56,9 @@ function StudentFee() {
     "Course",
   ];
   const [dateOfPayment, setDateOfPayment] = useState();
+  const [selectedAdmissionNumber, setSelectedAdmissionNumber] = useState();
+
+  console.log("this is selected", selectedAdmissionDetail);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,7 +66,7 @@ function StudentFee() {
         const res = await listAdmissions();
         setAdmissionDetail(res);
         setAdmission(
-          res?.map((item) => ({
+          res?.data?.map((item) => ({
             aNumber: item?.id,
             Name: item?.student?.first_name.concat(
               " ",
@@ -66,20 +84,78 @@ function StudentFee() {
 
     fetchData();
   }, []);
-
-  const TransactionHead = ["Transaction Id", "Description", "Amount", "Date"];
-
   const saveTransation = () => {
-    setTransactionRow((prev) => [...prev, transactionDetail]);
+    const payload = {
+      type: "credit",
+      category: "Admissions",
+      description: transactionDetail?.description,
+      transaction_date: format(dateOfPayment, "yyyy-MM-dd"),
+      reference_id: selectedAdmissionNumber,
+      amount: transactionDetail?.amount,
+      mode_of_payment: transactionDetail?.mode_of_payment,
+      category_id: 1,
+      branch_id: selectedAdmissionDetail?.branch_id,
+    };
+    createTransaction(payload).then((res) => {
+      getAdmissionTransaction(selectedAdmissionNumber, 1).then((res) => {
+        setFeeCollected(res?.data);
+        setStudentFee(
+          res?.data.reduce((sum, val) => {
+            return val?.type == "credit" ? sum + Number(val?.amount) : sum;
+          }, 0)
+        );
+        setTransactions(
+          res?.data
+            ?.filter((item) => item?.type == "credit")
+            .map((item) => ({
+              ref: item?.description,
+              description: item?.mode_of_payment,
+              amount: item?.amount,
+              paymentDate: item?.transaction_date,
+            }))
+        );
+      });
+    });
   };
 
   const saveCollegeTransation = () => {
-    setCollegeTransactionRow((prev) => [...prev, collegeTransactionDetail]);
-  };
+    const payload = {
+      type: "debit",
+      category: "Paid to College",
+      description: collegeTransactionDetail?.description,
+      transaction_date: format(dateOfPayment, "yyyy-MM-dd"),
+      reference_id: selectedAdmissionNumber,
+      amount: collegeTransactionDetail?.amount,
+      mode_of_payment: collegeTransactionDetail?.mode_of_payment,
+      category_id: 6,
+      branch_id: selectedAdmissionDetail?.branch_id,
+    };
+    createTransaction(payload).then((res) => {
+      getAdmissionTransaction(selectedAdmissionNumber, 6).then((res) => {
+        setFeeCollected(res?.data);
 
+        setCollegeFee(
+          res?.data.reduce((sum, val) => {
+            return val?.type == "debit" ? sum + Number(val?.amount) : sum;
+          }, 0)
+        );
+
+        setCollegeTransactionRow(
+          res?.data
+            ?.filter((item) => item?.type == "debit")
+            .map((item) => ({
+              ref: item?.description,
+              description: item?.mode_of_payment,
+              amount: item?.amount,
+              paymentDate: item?.transaction_date,
+            }))
+        );
+      });
+    });
+  };
   const calculateTotalFee = () => {
     return (
-      (Number(selectedAdmissionDetail?.course_fee?.admission_fee) || 0) +
+      // (Number(selectedAdmissionDetail?.course_fee?.admission_fee) || 0) +
       (Number(selectedAdmissionDetail?.course_fee?.hostel_term_1) || 0) +
       (Number(selectedAdmissionDetail?.course_fee?.hostel_term_2) || 0) +
       (Number(selectedAdmissionDetail?.course_fee?.hostel_term_3) || 0) +
@@ -96,11 +172,51 @@ function StudentFee() {
     );
   };
 
+  const calculateCollectedTotalFee = () => {
+    return collegeTransactionRow?.reduce(
+      (sum, val) => sum + Number(val?.amount),
+      0
+    );
+  };
+
   const getDetail = (val) => {
     setOpen(true);
     setSelectedAdmissionDetail(
-      admissionDetail?.filter((res) => res?.id == val?.aNumber)[0]
+      admissionDetail?.data?.filter((res) => res?.id == val?.aNumber)[0]
     );
+    setSelectedAdmissionNumber(val?.aNumber);
+    getAdmissionTransaction(val?.aNumber, 1).then((res) => {
+      setStudentFee(
+        res?.data.reduce((sum, val) => {
+          return val?.type == "credit" ? sum + Number(val?.amount) : sum;
+        }, 0)
+      );
+      setCollegeFee(
+        res?.data.reduce((sum, val) => {
+          return val?.type == "debit" ? sum + Number(val?.amount) : sum;
+        }, 0)
+      );
+      setTransactions(
+        res?.data
+          ?.filter((item) => item?.type == "credit")
+          .map((item) => ({
+            ref: item?.description,
+            description: item?.mode_of_payment,
+            amount: item?.amount,
+            paymentDate: item?.transaction_date,
+          }))
+      );
+      setCollegeTransactionRow(
+        res?.data
+          ?.filter((item) => item?.type == "debit")
+          .map((item) => ({
+            ref: item?.description,
+            description: item?.mode_of_payment,
+            amount: item?.amount,
+            paymentDate: item?.transaction_date,
+          }))
+      );
+    });
   };
 
   const handleChange = (e) => {
@@ -119,14 +235,26 @@ function StudentFee() {
     }));
   };
 
-  useEffect(() => {
-    if (transactionRow.length) {
-      setStudentFee(
-        parseFloat(transactionRow[transactionRow.length - 1]?.amount || 0) +
-          parseFloat(studentFee || 0)
-      );
-    }
-  }, [transactionRow]);
+  // useEffect(() => {
+  //   if (transactionRow.length) {
+  //     setStudentFee(
+  //       parseFloat(transactionRow[transactionRow.length - 1]?.amount || 0) +
+  //         parseFloat(studentFee || 0)
+  //     );
+  //   }
+  // }, [transactionRow]);
+
+  // useEffect(() => {
+  //   if (collegeTransactionRow.length) {
+  //     setCollegeFee(
+  //       parseFloat(
+  //         collegeTransactionRow[collegeTransactionRow.length - 1]?.amount || 0
+  //       ) + parseFloat(collegeFee || 0)
+  //     );
+  //   }
+  // }, [collegeTransactionRow]);
+
+  console.log("admission details", selectedAdmissionDetail);
 
   return (
     <div>
@@ -204,7 +332,7 @@ function StudentFee() {
                         padding: 5,
                       }}
                     >
-                      Total Fee:
+                      Student Name:
                     </span>
                     <span
                       style={{
@@ -215,7 +343,10 @@ function StudentFee() {
                         padding: 5,
                       }}
                     >
-                      {calculateTotalFee()}
+                      {selectedAdmissionDetail?.student?.first_name.concat(
+                        " ",
+                        selectedAdmissionDetail?.student?.last_name
+                      )}
                     </span>
                   </div>
                 </div>
@@ -234,53 +365,97 @@ function StudentFee() {
                         padding: "4px",
                       }}
                     >
-                      Fee Collected From Student:
+                      Amount Received
                     </h3>
                     <h3
                       style={{
                         fontSize: "14px",
                         fontWeight: "normal",
+                        // padding: "4px",
                         padding: `${
-                          calculateTotalFee() == studentFee ? "5px 10px" : "4px"
+                          studentFee ==
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ||
+                          studentFee >
+                            selectedAdmissionDetail?.course_fee?.service_charge
+                            ? "5px 10px"
+                            : "4px"
                         }`,
                         color: `${
-                          calculateTotalFee() === studentFee ? "white" : "black"
+                          studentFee ==
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ||
+                          studentFee >
+                            selectedAdmissionDetail?.course_fee?.service_charge
+                            ? "white"
+                            : "black"
                         }`,
                         backgroundColor: `${
-                          calculateTotalFee() == studentFee ? "lightgreen" : ""
+                          studentFee ==
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ||
+                          studentFee >
+                            selectedAdmissionDetail?.course_fee?.service_charge
+                            ? "lightgreen"
+                            : ""
                         }`,
                         borderRadius: `${
-                          calculateTotalFee() == studentFee ? "5px" : ""
+                          studentFee ==
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ||
+                          studentFee >
+                            selectedAdmissionDetail?.course_fee?.service_charge
+                            ? "5px"
+                            : ""
                         }`,
                       }}
                     >
-                      {calculateTotalFee() == studentFee ? "Paid" : studentFee}
+                      {studentFee ==
+                        selectedAdmissionDetail?.course_fee?.service_charge ||
+                      studentFee >
+                        selectedAdmissionDetail?.course_fee?.service_charge
+                        ? "Paid"
+                        : studentFee +
+                          ` / ${selectedAdmissionDetail?.course_fee?.service_charge}`}
                     </h3>
+                    {studentFee >
+                      selectedAdmissionDetail?.course_fee?.service_charge && (
+                      <h3
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: "normal",
+                          padding: "4px",
+                          flexGrow: "1",
+                          display: "flex",
+                          justifyContent: "end",
+                          alignItems: "center",
+                        }}
+                      >
+                        <GppMaybeIcon
+                          style={{
+                            width: "15px",
+                            height: "15px",
+                            marginRight: "5px",
+                            color: "gray",
+                          }}
+                        />
+                        Amount to be paid to college:{" "}
+                        {studentFee -
+                          selectedAdmissionDetail?.course_fee?.service_charge -
+                          collegeFee}
+                      </h3>
+                    )}
                   </div>
                 </div>
                 <div style={{ border: "1px solid gray", padding: "5px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid gray",
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: "16px",
-                      }}
-                    >
-                      Paid By Student
-                    </h3>
-                  </div>
                   <Stack style={{}}>
                     <BasicTable
                       columns={TransactionHead}
-                      rows={transactionRow}
+                      rows={transactions}
                       onClickFunction={getDetail}
                     />
-                    {studentFee != totalFee && (
+                    {studentFee !=
+                      selectedAdmissionDetail?.course_fee?.service_charge && (
                       <div
                         style={{
                           display: "flex",
@@ -290,7 +465,7 @@ function StudentFee() {
                       >
                         <TextField
                           id="outlined-basic"
-                          name="ref"
+                          name="description"
                           label="Transation Ref"
                           variant="outlined"
                           autoComplete="off"
@@ -310,7 +485,7 @@ function StudentFee() {
 
                         <select
                           id="my-select"
-                          name="description"
+                          name="mode_of_payment"
                           style={{
                             height: "50px",
                             borderRadius: "8px",
@@ -363,52 +538,84 @@ function StudentFee() {
                     )}
                   </Stack>
                 </div>
-                {studentFee > 0 && (
-                  <div style={{ marginTop: "50px" }}>
-                    <div
+                {/* {studentFee > 0 && ( */}
+                <div style={{ marginTop: "50px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignContent: "center",
+                      gap: "5px",
+                    }}
+                  >
+                    <h3
                       style={{
-                        display: "flex",
-                        alignContent: "center",
-                        gap: "5px",
+                        fontSize: "14px",
+                        backgroundColor: "lightgray",
+                        padding: "4px",
                       }}
                     >
-                      <h3
-                        style={{
-                          fontSize: "14px",
-                          backgroundColor: "lightgray",
-                          padding: "4px",
-                        }}
-                      >
-                        Fee Paid to College:
-                      </h3>
-                      <h3
-                        style={{
-                          fontSize: "14px",
-                          fontWeight: "normal",
-                          padding: "4px",
-                        }}
-                      >
-                        {totalFee === studentFee
-                          ? "Paid Completely"
-                          : studentFee}
-                      </h3>
-                    </div>
-                    <div style={{ border: "1px solid gray", padding: "5px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          borderBottom: "1px solid gray",
-                        }}
-                      >
-                        <h3 style={{ fontSize: "16px" }}>Paid To College</h3>
-                      </div>
-                      <Stack style={{}}>
-                        <BasicTable
-                          columns={TransactionHead}
-                          rows={collegeTransactionRow}
-                          onClickFunction={getDetail}
-                        />
+                      Amount Paid
+                    </h3>
+                    <h3
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "normal",
+                        padding: `${
+                          calculateTotalFee() -
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ==
+                          calculateCollectedTotalFee()
+                            ? "5px 10px"
+                            : "4px"
+                        }`,
+                        color: `${
+                          calculateTotalFee() -
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ==
+                          calculateCollectedTotalFee()
+                            ? "white"
+                            : "black"
+                        }`,
+                        backgroundColor: `${
+                          calculateTotalFee() -
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ==
+                          calculateCollectedTotalFee()
+                            ? "lightgreen"
+                            : ""
+                        }`,
+                        borderRadius: `${
+                          calculateTotalFee() -
+                            selectedAdmissionDetail?.course_fee
+                              ?.service_charge ==
+                          calculateCollectedTotalFee()
+                            ? "5px"
+                            : ""
+                        }`,
+                      }}
+                    >
+                      {calculateTotalFee() -
+                        selectedAdmissionDetail?.course_fee?.service_charge ==
+                      calculateCollectedTotalFee()
+                        ? "Paid"
+                        : calculateCollectedTotalFee() +
+                          ` / ${
+                            calculateTotalFee() -
+                            selectedAdmissionDetail?.course_fee?.service_charge
+                          }`}
+                    </h3>
+                  </div>
+                  <div style={{ border: "1px solid gray", padding: "5px" }}>
+                    <Stack style={{}}>
+                      <BasicTable
+                        columns={TransactionHead}
+                        rows={collegeTransactionRow}
+                        onClickFunction={getDetail}
+                      />
+                      {collegeFee !=
+                        calculateTotalFee() -
+                          selectedAdmissionDetail?.course_fee
+                            ?.service_charge && (
                         <div
                           style={{
                             display: "flex",
@@ -418,7 +625,7 @@ function StudentFee() {
                         >
                           <TextField
                             id="outlined-basic"
-                            name="ref"
+                            name="description"
                             label="Transation Ref"
                             variant="outlined"
                             autoComplete="off"
@@ -435,24 +642,26 @@ function StudentFee() {
                             }}
                             onChange={(e) => handleCollegeChange(e)}
                           />
-                          <TextField
-                            id="outlined-basic"
-                            name="description"
-                            label="Description"
-                            variant="outlined"
-                            autoComplete="off"
-                            style={{ width: "100%" }}
-                            sx={{
-                              "& .MuiInputBase-root": {
-                                height: "50px",
-                                borderRadius: "8px",
-                              },
-                              "& .MuiInputLabel-root": {
-                                top: "-2px",
-                                fontSize: "14px",
-                              },
+                          <select
+                            id="my-select"
+                            name="mode_of_payment"
+                            style={{
+                              height: "50px",
+                              borderRadius: "8px",
+                              width: "100%",
                             }}
                             onChange={(e) => handleCollegeChange(e)}
+                          >
+                            <option value="">Select Payment Mode</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Gpay">Gpay</option>
+                            <option value="Check">Check</option>
+                          </select>
+                          <DatePicker
+                            className="paymentDate"
+                            selected={dateOfPayment}
+                            onChange={(date) => setDateOfPayment(date)}
+                            placeholderText="DD-MM-YYYY"
                           />
                           <TextField
                             id="outlined-basic"
@@ -485,10 +694,11 @@ function StudentFee() {
                             Save
                           </Button>
                         </div>
-                      </Stack>
-                    </div>
+                      )}
+                    </Stack>
                   </div>
-                )}
+                </div>
+                {/* )} */}
               </div>
             </div>
           }
