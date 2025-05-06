@@ -1,14 +1,14 @@
 import { Button, FormControl, FormHelperText, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import BasicTable from "../../components/atoms/Table";
-import Drawer from "../../components/atoms/Drawer";
+import BasicTable from "../../../components/atoms/Table";
+import Drawer from "../../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { createCourse } from "../../services/createCourse";
-import CustomCircularProgress from "../../components/atoms/CircularProgress";
-import { listUniversities } from "../../services/listUniversities";
-import { listAgents } from "../../services/listAgents";
-import { createAgent } from "../../services/createAgent";
+import { createCourse } from "../../../services/createCourse";
+import CustomCircularProgress from "../../../components/atoms/CircularProgress";
+import { listUniversities } from "../../../services/listUniversities";
+import { listAgents } from "../../../services/listAgents";
+import { createAgent } from "../../../services/createAgent";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate } from "react-router-dom";
 
@@ -18,12 +18,10 @@ function Agents() {
   const [agentName, setAgentName] = useState("");
   const [agentType, setAgentType] = useState("");
   const [phone, setPhone] = useState("");
-  const [fee, setfee] = useState("");
   const [errors, setErrors] = useState({
     agentName: "",
     agentType: "",
     phone: "",
-    fee: "",
   });
   const [loading, setLoading] = useState(false);
   const [agentList, setAgentList] = useState([]);
@@ -396,7 +394,7 @@ function Agents() {
                       <FormHelperText>{errors.phone}</FormHelperText>
                     )}
                   </FormControl>
-                  <FormControl
+                  {/* <FormControl
                     error={Boolean(errors.fee)}
                     style={{ width: "100%" }}
                   >
@@ -424,7 +422,7 @@ function Agents() {
                     {errors.fee && (
                       <FormHelperText>{errors.fee}</FormHelperText>
                     )}
-                  </FormControl>
+                  </FormControl> */}
                 </div>
               </div>
               {createOrEdit === "create" && (

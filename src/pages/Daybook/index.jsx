@@ -24,8 +24,12 @@ function Daybook() {
   const [value, setValue] = useState(null);
   const [allCategories, setAllCategories] = useState();
   const [dateOfPayment, setDateOfPayment] = useState();
-  const [selectCategory, setSelectCategory] = useState();
+  const [selectedCategory, setSelectedCategory] = useState({
+    id: "",
+    name: "",
+  });
   const [amount, setAmount] = useState();
+  const [mode, setMode] = useState();
 
   const getTransactions = () => {
     const payload = {
@@ -41,7 +45,7 @@ function Daybook() {
           income: <span style={{ color: "green" }}>{item?.income}</span>,
           incomeDue: item?.income_due,
           expense: <span style={{ color: "red" }}>{item?.expense}</span>,
-          expenseDue: item?.expense_due,
+          expenseDue: item?.expense_due < 0 ? 0 : item?.expense_due,
           date: item?.date,
         }))
       );
@@ -73,20 +77,27 @@ function Daybook() {
   const saveTransaction = () => {
     const payload = {
       type: "debit",
-      amount: amount,
+      category: selectedCategory?.name,
+      description: "-",
       transaction_date: format(dateOfPayment, "yyyy-MM-dd"),
-      category_id: selectCategory,
-      mode_of_payment: "UPI",
-      description: "E Bill",
+      reference_id: "",
+      amount: amount,
+      mode_of_payment: mode,
+      category_id: selectedCategory?.id,
+      branch_id: 1,
     };
+
+    console.log("the payload", payload);
 
     createTransaction(payload).then((res) => {
       getTransactions();
       setAmount("");
       setDateOfPayment();
-      setSelectCategory("");
+      setSelectedCategory({});
     });
   };
+
+  console.log("the", selectedCategory);
 
   return (
     <div>
@@ -163,7 +174,7 @@ function Daybook() {
         </div>
         <div
           style={{
-            backgroundColor: "red",
+            backgroundColor: "orange",
             padding: "8px",
             borderRadius: "20px",
             fontSize: "14px",
@@ -192,7 +203,7 @@ function Daybook() {
         style={{
           display: "flex",
           alignItems: "center",
-          width: "50%",
+          width: "60%",
           gap: "10px",
           margin: "20px 0px",
         }}
@@ -206,13 +217,40 @@ function Daybook() {
             fontSize: "14px",
             height: "45px",
           }}
-          value={selectCategory}
-          onChange={(e) => setSelectCategory(e.target.value)}
+          value={selectedCategory.id}
+          onChange={(e) => {
+            const selectedId = e.target.value;
+            const selectedCat = allCategories?.find(
+              (cat) => cat.id == selectedId
+            );
+            setSelectedCategory({
+              id: selectedCat?.id || "",
+              name: selectedCat?.name || "",
+            });
+          }}
         >
           <option value="">Select Category</option>
           {allCategories?.map((cat) => (
-            <option value={cat?.id}>{cat?.name}</option>
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
           ))}
+        </select>
+        <select
+          id="my-select"
+          name="mode"
+          style={{
+            height: "45px",
+            borderRadius: "8px",
+            border: "1px solid lightgray",
+          }}
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+        >
+          <option value="">Select Payment Mode</option>
+          <option value="Cash">Cash</option>
+          <option value="Gpay">Gpay</option>
+          <option value="Check">Check</option>
         </select>
         <DatePicker
           className="transaction"

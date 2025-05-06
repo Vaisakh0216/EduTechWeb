@@ -1,14 +1,14 @@
 import { Button, FormControl, FormHelperText, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import BasicTable from "../../components/atoms/Table";
-import Drawer from "../../components/atoms/Drawer";
+import BasicTable from "../../../components/atoms/Table";
+import Drawer from "../../../components/atoms/Drawer";
 import ClearIcon from "@mui/icons-material/Clear";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { createCourse } from "../../services/createCourse";
-import CustomCircularProgress from "../../components/atoms/CircularProgress";
-import { listCourses } from "../../services/listCourses";
-import { listUniversities } from "../../services/listUniversities";
-import courseImage from "../../assets/course.jpg";
+import { createCourse } from "../../../services/createCourse";
+import CustomCircularProgress from "../../../components/atoms/CircularProgress";
+import { listCourses } from "../../../services/listCourses";
+import { listUniversities } from "../../../services/listUniversities";
+import courseImage from "../../../assets/course.jpg";
 
 function Course() {
   const [open, setOpen] = useState(false);

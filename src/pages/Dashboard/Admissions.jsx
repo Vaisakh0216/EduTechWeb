@@ -1,7 +1,7 @@
 import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import React from "react";
 import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
-function AdmissionTotal() {
+function AdmissionTotal({ data }) {
   return (
     <Card sx={{ height: "160px", borderRadius: "10px" }}>
       <CardContent>
@@ -18,7 +18,7 @@ function AdmissionTotal() {
               >
                 Total Admissions
               </Typography>
-              <Typography variant="h4">{3000000}</Typography>
+              <Typography variant="h4">{data}</Typography>
             </Stack>
             <Avatar
               sx={{

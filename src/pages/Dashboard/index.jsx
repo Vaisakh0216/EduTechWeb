@@ -1,5 +1,5 @@
 import { Grid2 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Income from "./Income";
 import AdmissionTotal from "./Admissions";
 import TotalExpense from "./Expense";
@@ -8,8 +8,22 @@ import InflationChart from "./AdmissionBars";
 import DateRangePicker from "rsuite/DateRangePicker";
 import "rsuite/DateRangePicker/styles/index.css";
 import FinancialOverview from "./FinancialOverview";
+import { getDashData } from "../../services/getDashboardData,js";
 
 function Dashboard() {
+  const [dashboardData, setDashboardData] = useState();
+
+  useEffect(() => {
+    const payload = {
+      start_date: "",
+      end_date: "",
+      branch_id: 1,
+    };
+    getDashData(payload).then((res) => {
+      setDashboardData(res);
+    });
+  }, []);
+
   return (
     <div
       style={{
@@ -64,16 +78,19 @@ function Dashboard() {
       </div>
       <Grid2 container spacing={5}>
         <Grid2 lg={3} sm={6} xs={12}>
-          <Income />
+          <Income data={dashboardData?.totalIncome} />
         </Grid2>
         <Grid2 lg={3} sm={6} xs={12}>
-          <AdmissionTotal />
+          <AdmissionTotal data={dashboardData?.totalAdmissions} />
         </Grid2>
         <Grid2 lg={3} sm={6} xs={12}>
-          <TotalExpense />
+          <TotalExpense data={dashboardData?.totalExpense} />
         </Grid2>
         <Grid2 lg={3} sm={6} xs={12}>
-          <Net />
+          <Net
+            inc={dashboardData?.totalIncome}
+            exp={dashboardData?.totalExpense}
+          />
         </Grid2>
         <Grid2 lg={8} xs={12}>
           <InflationChart />

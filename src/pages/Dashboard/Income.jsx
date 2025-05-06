@@ -2,7 +2,7 @@ import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import React from "react";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
-function Income() {
+function Income({ data }) {
   return (
     <Card sx={{ height: "160px", borderRadius: "10px" }}>
       <CardContent>
@@ -19,7 +19,7 @@ function Income() {
               >
                 Income
               </Typography>
-              <Typography variant="h4">{3000000}</Typography>
+              <Typography variant="h4">{data}</Typography>
             </Stack>
             <Avatar
               sx={{

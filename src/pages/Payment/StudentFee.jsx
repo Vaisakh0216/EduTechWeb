@@ -98,14 +98,14 @@ function StudentFee() {
     };
     createTransaction(payload).then((res) => {
       getAdmissionTransaction(selectedAdmissionNumber, 1).then((res) => {
-        setFeeCollected(res?.data);
+        setFeeCollected(res);
         setStudentFee(
-          res?.data.reduce((sum, val) => {
+          res?.reduce((sum, val) => {
             return val?.type == "credit" ? sum + Number(val?.amount) : sum;
           }, 0)
         );
         setTransactions(
-          res?.data
+          res
             ?.filter((item) => item?.type == "credit")
             .map((item) => ({
               ref: item?.description,
@@ -132,16 +132,14 @@ function StudentFee() {
     };
     createTransaction(payload).then((res) => {
       getAdmissionTransaction(selectedAdmissionNumber, 6).then((res) => {
-        setFeeCollected(res?.data);
-
+        setFeeCollected(res);
         setCollegeFee(
-          res?.data.reduce((sum, val) => {
+          res?.reduce((sum, val) => {
             return val?.type == "debit" ? sum + Number(val?.amount) : sum;
           }, 0)
         );
-
         setCollegeTransactionRow(
-          res?.data
+          res
             ?.filter((item) => item?.type == "debit")
             .map((item) => ({
               ref: item?.description,
@@ -187,17 +185,13 @@ function StudentFee() {
     setSelectedAdmissionNumber(val?.aNumber);
     getAdmissionTransaction(val?.aNumber, 1).then((res) => {
       setStudentFee(
-        res?.data.reduce((sum, val) => {
+        res?.reduce((sum, val) => {
           return val?.type == "credit" ? sum + Number(val?.amount) : sum;
         }, 0)
       );
-      setCollegeFee(
-        res?.data.reduce((sum, val) => {
-          return val?.type == "debit" ? sum + Number(val?.amount) : sum;
-        }, 0)
-      );
+
       setTransactions(
-        res?.data
+        res
           ?.filter((item) => item?.type == "credit")
           .map((item) => ({
             ref: item?.description,
@@ -206,8 +200,15 @@ function StudentFee() {
             paymentDate: item?.transaction_date,
           }))
       );
+    });
+    getAdmissionTransaction(val?.aNumber, 6).then((res) => {
+      setCollegeFee(
+        res?.reduce((sum, val) => {
+          return val?.type == "debit" ? sum + Number(val?.amount) : sum;
+        }, 0)
+      );
       setCollegeTransactionRow(
-        res?.data
+        res
           ?.filter((item) => item?.type == "debit")
           .map((item) => ({
             ref: item?.description,

@@ -82,13 +82,13 @@ function Cashbook() {
   }, [value]);
 
   const totalCredit = () => {
-    return completeTransactions.reduce((sum, val) => {
+    return completeTransactions?.reduce((sum, val) => {
       return val?.type === "credit" ? sum + Number(val?.amount || 0) : sum;
     }, 0);
   };
 
   const totalDebit = () => {
-    return completeTransactions.reduce((sum, val) => {
+    return completeTransactions?.reduce((sum, val) => {
       return val?.type === "debit" ? sum + Number(val?.amount || 0) : sum;
     }, 0);
   };
@@ -169,7 +169,7 @@ function Cashbook() {
         </div>
         <div
           style={{
-            backgroundColor: "red",
+            backgroundColor: "orange",
             width: "150px",
             padding: "8px",
             borderRadius: "20px",

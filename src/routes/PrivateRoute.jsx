@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 const PrivateRoute = () => {
-  let isAuthenticated = localStorage.getItem("authToken"); // Replace this with actual authentication logic
+  let isAuthenticated = localStorage.getItem("authToken");
 
   if (!isAuthenticated) {
-    return <Navigate to="/" />; // Redirect to login if not authenticated
+    return <Navigate to="/" />;
   }
 
-  return <Outlet />; // Render nested routes if authenticated
+  return <Outlet />;
 };
 
 export default PrivateRoute;

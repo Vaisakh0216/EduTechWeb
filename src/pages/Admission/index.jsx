@@ -207,11 +207,48 @@ function Onboard() {
         ref_platform: studentData?.reference,
         address: studentData?.address,
       };
+      const convertToFormData = (payload) => {
+        const formData = new FormData();
+        Object.entries(payload).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
+        return formData;
+      };
 
       console.log("this is admissionPayload", admissionPayload);
-      createAdmission(admissionPayload).then((res) => {
+      createAdmission(convertToFormData(admissionPayload)).then((res) => {
         fetchData();
         setOpen(false);
+        // if (res?.id) {
+        //   setAgentFeelist((prev) => {
+        //     const updated = {
+        //       main: {
+        //         ...prev.main,
+        //         admission_id: res.id,
+        //       },
+        //       sub: {
+        //         ...prev.sub,
+        //         admission_id: res.id,
+        //       },
+        //       college: {
+        //         ...prev.college,
+        //         admission_id: res.id,
+        //       },
+        //     };
+
+        //     createAgentFee(updated.main).then((res) =>
+        //       console.log("Main Fee Response", res)
+        //     );
+        //     createAgentFee(updated.sub).then((res) =>
+        //       console.log("Sub Fee Response", res)
+        //     );
+        //     createAgentFee(updated.college).then((res) =>
+        //       console.log("College Fee Response", res)
+        //     );
+
+        //     return updated;
+        //   });
+        // }
       });
       // const studentPayload = {
       // first_name: studentData?.first_name,
@@ -485,9 +522,7 @@ function Onboard() {
                       value={admissionData?.branch_id}
                       onChange={handleAdmission}
                     >
-                      <option value="1">Pulpalli</option>
-                      <option value="2">Mysore</option>
-                      <option value="2">Sultan Bathery</option>
+                      <option value="1">Mysore</option>
                     </select>
                   </div>
                   <div

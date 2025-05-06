@@ -3,16 +3,16 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard/index";
 import ResponsiveDrawer from "./components/organisms/Layout";
 import "./App.css";
-import Onboard from "./pages/Admission/Onboard";
 import College from "./pages/Admission/College";
 import Course from "./pages/Admission/Course";
 import Payment from "./pages/Payment/index";
-import Login from "./pages/Login";
+import Login from "./pages/Auth/Login";
 import PrivateRoute from "./routes/PrivateRoute";
 import Agents from "./pages/Admission/Agents";
 import Daybook from "./pages/Daybook";
 import Cashbook from "./pages/Cashbook";
-import AgentDetail from "./pages/Agent/agentDetail";
+import AgentDetail from "./pages/Admission/Agents/agentDetail";
+import Onboard from "./pages/Admission/index";
 
 function App() {
   return (

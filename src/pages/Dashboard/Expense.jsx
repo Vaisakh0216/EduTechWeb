@@ -2,7 +2,7 @@ import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import React from "react";
 import MoneyIcon from "@mui/icons-material/Money";
 
-function TotalExpense() {
+function TotalExpense({ data }) {
   return (
     <Card sx={{ height: "160px", borderRadius: "10px" }}>
       <CardContent>
@@ -19,7 +19,7 @@ function TotalExpense() {
               >
                 Expense
               </Typography>
-              <Typography variant="h4">{3000000}</Typography>
+              <Typography variant="h4">{data}</Typography>
             </Stack>
             <Avatar
               sx={{

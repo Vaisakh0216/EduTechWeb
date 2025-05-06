@@ -29,6 +29,8 @@ body {
   height: 50px;
   border-radius: 8px;
   border: 1px solid lightgray;
+  width: 160px !important;
+  padding: 10px;
 }
 .react-datepicker-wrapper .transaction {
   height: 45px;
