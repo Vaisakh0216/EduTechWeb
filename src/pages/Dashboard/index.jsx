@@ -9,9 +9,13 @@ import DateRangePicker from "rsuite/DateRangePicker";
 import "rsuite/DateRangePicker/styles/index.css";
 import FinancialOverview from "./FinancialOverview";
 import { getDashData } from "../../services/getDashboardData,js";
+import PieChart from "./FinancialOverview";
+import LineChart from "./AdmissionBars";
+import AreaChart from "./AdmissionBars";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState();
+  const userData = JSON.parse(localStorage.getItem("userInfo"));
 
   useEffect(() => {
     const payload = {
@@ -34,70 +38,36 @@ function Dashboard() {
     >
       <div
         style={{
-          marginBottom: "20px",
           display: "flex",
-          width: "100%",
-          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            width: "25%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <label style={{ fontSize: "14px" }}>Select Branch</label>
-          <select
-            id="my-select"
-            name="branch_id"
+        <div style={{ width: "50%" }}>
+          <h1
             style={{
-              height: "41px",
-              borderRadius: "8px",
-              borderColor: "lightgray",
+              fontWeight: "500",
+              fontSize: "35px",
+              padding: 0,
+              margin: 0,
             }}
           >
-            {" "}
-            <option value="1">All Branches</option>
-            <option value="2">Mysore</option>
-            <option value="3">Pulpalli</option>
-            <option value="4">Sulthan Bathery</option>
-          </select>
+            {"Hi"} {userData?.name}
+          </h1>
+          <span style={{ color: "#898989" }}>Welcome Back</span>
         </div>
         <div
-          style={{
-            width: "25%",
-            display: "flex",
-            flexDirection: "column",
-            marginLeft: "20px",
-          }}
-        >
-          <label style={{ fontSize: "14px" }}>Select Date Range</label>
-          <DateRangePicker size="lg" />
-        </div>
+          style={{ width: "50%", display: "flex", justifyContent: "flex-end" }}
+        ></div>
       </div>
-      <Grid2 container spacing={5}>
-        <Grid2 lg={3} sm={6} xs={12}>
-          <Income data={dashboardData?.totalIncome} />
-        </Grid2>
-        <Grid2 lg={3} sm={6} xs={12}>
-          <AdmissionTotal data={dashboardData?.totalAdmissions} />
-        </Grid2>
-        <Grid2 lg={3} sm={6} xs={12}>
-          <TotalExpense data={dashboardData?.totalExpense} />
-        </Grid2>
-        <Grid2 lg={3} sm={6} xs={12}>
-          <Net
-            inc={dashboardData?.totalIncome}
-            exp={dashboardData?.totalExpense}
-          />
-        </Grid2>
-        <Grid2 lg={8} xs={12}>
-          <InflationChart />
-        </Grid2>
-        {/* <Grid2 lg={4} md={6} xs={12}>
-          <FinancialOverview />
-        </Grid2> */}
+      <Grid2 container spacing={2} sx={{ marginTop: "50px" }}>
+        <Income />
+        <AdmissionTotal />
+        <TotalExpense />
+        <Net />
+      </Grid2>
+      <Grid2 container spacing={2} sx={{ marginTop: "15px" }}>
+        <PieChart title="Admissions on Each Days" subtitle="2025" />
+        <AreaChart title="Profit Range" subtitle="2025" width={450} />
       </Grid2>
     </div>
   );

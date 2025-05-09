@@ -55,9 +55,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function BasicTable({ columns, rows, onClickFunction }) {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ backgroundColor: "white" }}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead sx={{ backgroundColor: "lightgray" }}>
+        <TableHead sx={{ borderBottom: "1px solid gray" }}>
           <TableRow>
             {/* <TableCell style={{ fontWeight: "bold" }} align="center">
               S/N
@@ -66,12 +66,15 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
               <TableCell
                 key={index}
                 align="center"
-                style={{ fontWeight: "bold" }}
+                style={{ fontWeight: "bold", color: "#898989" }}
               >
                 {col}
               </TableCell>
             ))}
-            <TableCell style={{ fontWeight: "bold" }} align="center">
+            <TableCell
+              style={{ fontWeight: "bold", color: "#898989" }}
+              align="center"
+            >
               Action
             </TableCell>
           </TableRow>
@@ -81,12 +84,13 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
             // Use a unique key for each row, assuming row.id is unique
             <TableRow
               key={row.id || rowIndex}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              sx={{
+                "&:last-child td, &:last-child th": { border: 0 },
+                backgroundColor: rowIndex % 2 ? "#fafafa" : "#f0f0f0",
+                textTransform: "capitalize",
+              }}
               onClick={() => onClickFunction(row, rowIndex)}
             >
-              {/* <TableCell component="td" align="center">
-                {rowIndex + 1}
-              </TableCell> */}
               {Object.keys(row).map((key, cellIndex) => (
                 // Ensure a unique key by combining row.id with cellIndex
                 <TableCell
@@ -98,7 +102,7 @@ export default function BasicTable({ columns, rows, onClickFunction }) {
                 </TableCell>
               ))}
               <TableCell component="td" align="center">
-                <DeleteIcon />
+                <DeleteIcon sx={{ color: "#898989", cursor: "pointer" }} />
               </TableCell>
             </TableRow>
           ))}

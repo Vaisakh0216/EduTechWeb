@@ -87,7 +87,7 @@ function Course() {
 
   const getCourselist = () => {
     const universityMap = new Map();
-    universityList.forEach((uni) => {
+    universityList?.forEach((uni) => {
       universityMap && universityMap.set(uni.id, uni.name);
     });
 
@@ -413,7 +413,7 @@ function Course() {
                           onChange={(e) => setUniversity(e.target.value)}
                         >
                           <option value="">Select University</option>
-                          {universityList.length &&
+                          {universityList?.length &&
                             universityList?.map((uni) => (
                               <option id={uni?.id} value={uni?.id}>
                                 {uni?.name}

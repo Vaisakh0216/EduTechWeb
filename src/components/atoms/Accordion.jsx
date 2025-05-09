@@ -2,19 +2,19 @@ import { colors } from "@mui/material";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const CustomAccordion = () => {
-  // State to track the open/close status of each accordion item
+const CustomAccordion = ({ mainMenus, subMenus }) => {
   const [openIndex, setOpenIndex] = useState(null);
   const navigate = useNavigate();
-  // Function to handle the toggling of each accordion
   const handleToggle = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   const headerStyle = {
-    color: "white",
+    color: "black",
     cursor: "pointer",
     textAlign: "left",
+    fontSize: "14px",
+    fontWeight: "500",
   };
 
   const nestedListStyle = {
@@ -24,27 +24,37 @@ const CustomAccordion = () => {
 
   const listItemStyle = {
     padding: "8px",
-    fontSize: "16px",
+    fontSize: "14px",
+    fontWeight: "500",
     cursor: "pointer",
     width: "full",
-    color: "white",
+    color: "black",
   };
 
   return (
     <div>
       <div style={headerStyle} onClick={() => handleToggle(0)}>
-        Admission
+        {mainMenus}
       </div>
       {openIndex === 0 && (
         <div style={nestedListStyle}>
-          <div
+          {subMenus?.map((menus) => (
+            <div
+              style={listItemStyle}
+              onClick={() => {
+                navigate(`/${menus}`);
+              }}
+            >
+              {menus}
+            </div>
+          ))}
+          {/* <div
             style={listItemStyle}
             onClick={() => {
-              navigate("/Onboard");
-              console.log("Clicking onbaord");
+              navigate("/Admission");
             }}
           >
-            Student
+            Admission
           </div>
           <div
             style={listItemStyle}
@@ -69,7 +79,7 @@ const CustomAccordion = () => {
             }}
           >
             Agent
-          </div>
+          </div> */}
           <div style={listItemStyle} onClick={() => handleToggle(1)}></div>
         </div>
       )}

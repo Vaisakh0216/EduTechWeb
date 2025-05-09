@@ -21,6 +21,8 @@ function Login() {
       );
       console.log(res.data);
       localStorage.setItem("authToken", res?.data?.token);
+      localStorage.setItem("userInfo", JSON.stringify(res?.data?.user));
+
       navigate("/Dashboard");
     } catch (error) {
       setAlertShow(true);

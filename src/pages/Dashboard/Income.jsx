@@ -1,35 +1,69 @@
 import { Avatar, Card, CardContent, Stack, Typography } from "@mui/material";
 import React from "react";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import incomeIcon from "../../assets/incomeIcon.svg";
 
 function Income({ data }) {
   return (
-    <Card sx={{ height: "160px", borderRadius: "10px" }}>
+    <Card
+      sx={{
+        borderRadius: "10px",
+        flexGrow: "1",
+        height: "180px",
+      }}
+    >
       <CardContent>
         <Stack spacing={3}>
           <Stack
             direction="row"
-            sx={{ alignItems: "flex-start", justifyContent: "space-between" }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
             spacing={3}
           >
-            <Stack spacing={1}>
-              <Typography
-                style={{ color: "grey", fontSize: "14px" }}
-                variant="overline"
-              >
-                Income
-              </Typography>
-              <Typography variant="h4">{data}</Typography>
-            </Stack>
-            <Avatar
-              sx={{
-                backgroundColor: "#635AFF",
-                height: "56px",
-                width: "56px",
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              <CurrencyRupeeIcon />
-            </Avatar>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: "600",
+                    fontSize: "20px",
+                  }}
+                >
+                  120,000,000
+                </span>
+              </div>
+              <span
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "400",
+                  color: "#898989",
+                }}
+              >
+                Income
+              </span>
+            </div>
+            <img
+              src={incomeIcon}
+              style={{
+                width: "56px",
+                height: "56px",
+                backgroundColor: "lightgray",
+                borderRadius: "50%",
+              }}
+            />
           </Stack>
         </Stack>
       </CardContent>

@@ -297,8 +297,8 @@ function StudentFee() {
                   >
                     <span
                       style={{
-                        fontWeight: "bold",
-                        fontSize: "16px",
+                        fontWeight: "600",
+                        fontSize: "14px",
                         width: "30%",
                         backgroundColor: "lightgray",
                         padding: 5,
@@ -326,8 +326,8 @@ function StudentFee() {
                   >
                     <span
                       style={{
-                        fontWeight: "bold",
-                        fontSize: "16px",
+                        fontWeight: "600",
+                        fontSize: "14px",
                         width: "30%",
                         backgroundColor: "lightgray",
                         padding: 5,
@@ -363,7 +363,9 @@ function StudentFee() {
                       style={{
                         fontSize: "14px",
                         backgroundColor: "lightgray",
-                        padding: "4px",
+                        padding: "5px 10px",
+                        fontWeight: "600",
+                        borderRadius: "20px",
                       }}
                     >
                       Amount Received
@@ -552,7 +554,9 @@ function StudentFee() {
                       style={{
                         fontSize: "14px",
                         backgroundColor: "lightgray",
-                        padding: "4px",
+                        padding: "5px 10px",
+                        fontWeight: "600",
+                        borderRadius: "20px",
                       }}
                     >
                       Amount Paid

@@ -1,4 +1,11 @@
-import { Button, FormHelperText, TextField, FormControl } from "@mui/material";
+import {
+  Button,
+  FormHelperText,
+  TextField,
+  FormControl,
+  InputAdornment,
+  Avatar,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import BasicTable from "../../../components/atoms/Table";
 import Drawer from "../../../components/atoms/Drawer";
@@ -15,6 +22,8 @@ import { updateCollege } from "../../../services/updateCollege";
 import collegeImage from "../../../assets/college.jpg";
 import { createInstitutionCourses } from "../../../services/createInstitutionCourses";
 import { updateCourseFee } from "../../../services/updateCourseFee";
+import SearchIcon from "@mui/icons-material/Search";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 function College() {
   const [open, setOpen] = useState(false);
@@ -268,69 +277,68 @@ function College() {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          backgroundColor: "white",
-          padding: "30px",
-          borderRadius: "10px",
-          boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.1)",
+          width: "100%",
+          alignItems: "center",
+          marginBottom: "30px",
         }}
       >
+        <div>
+          <h2 style={{ fontWeight: "600" }}> Colleges</h2>
+        </div>
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
             justifyContent: "center",
+            alignContent: "center",
             gap: "10px",
-            width: "100%",
           }}
         >
-          <span style={{ fontSize: "14px" }}>Search by college name</span>
           <TextField
-            id="outlined-basic"
-            label="Name"
-            variant="outlined"
+            placeholder="Search..."
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              },
+            }}
             sx={{
               "& .MuiInputBase-root": {
-                height: "45px",
+                height: "40px",
                 borderRadius: "8px",
+                backgroundColor: "white",
               },
-              "& .MuiInputLabel-root": {
-                top: "-5px",
+              "& .MuiInputBase-input::placeholder": {
                 fontSize: "14px",
               },
             }}
           />
-        </div>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <span style={{ fontSize: "30px", fontWeight: "bold" }}>150</span>
-          <p style={{ padding: "0px", margin: "0px", fontSize: "14px" }}>
-            Total Colleges
-          </p>
-        </div>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+          <Button
+            variant="outlined"
+            startIcon={<FilterListIcon />}
+            style={{
+              height: "40px",
+              borderRadius: "8px",
+              fontSize: "14px",
+              textTransform: "capitalize",
+              backgroundColor: "white",
+              color: "black",
+            }}
+          >
+            Filter
+          </Button>
           <Button
             variant="contained"
             style={{
               background: "linear-gradient(to right, #14ADD6, #384295)",
-              fontSize: "16px",
+              fontSize: "14px",
               textTransform: "inherit",
               cursor: "pointer",
               padding: "10px 30px",
-              borderRadius: "15px",
+              borderRadius: "8px",
+              height: "40px",
             }}
             onClick={() => {
               setOpen(true);
@@ -345,38 +353,6 @@ function College() {
         </div>
       </div>
       <div style={{ marginTop: "20px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            margin: "10px",
-          }}
-        >
-          <div>
-            <h3>All Colleges</h3>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: "5px",
-              alignItems: "center",
-              fontSize: "14px",
-            }}
-          >
-            <span>Show</span>
-            <span
-              style={{
-                padding: "10px 18px",
-                backgroundColor: "white",
-                border: "1px solid lightblue",
-                borderRadius: "5px",
-              }}
-            >
-              5
-            </span>
-            <span>Per page</span>
-          </div>
-        </div>
         <BasicTable
           columns={columns}
           rows={collegeList}
@@ -448,7 +424,9 @@ function College() {
               </div>
               <>
                 <div style={{ padding: "20px 20px 0px 20px" }}>
-                  <h4>College Details</h4>
+                  <h4 style={{ fontWeight: "600", fontSize: "16px" }}>
+                    College Details
+                  </h4>
                   <div
                     style={{
                       display: "flex",
@@ -472,11 +450,12 @@ function College() {
                         onChange={handleChange}
                         sx={{
                           "& .MuiInputBase-root": {
-                            height: "50px",
+                            height: "45px",
                             borderRadius: "8px",
+                            fontSize: "14px",
                           },
                           "& .MuiInputLabel-root": {
-                            top: "-2px",
+                            top: "-3px",
                             fontSize: "14px",
                           },
                         }}
@@ -500,11 +479,12 @@ function College() {
                         onChange={handleChange}
                         sx={{
                           "& .MuiInputBase-root": {
-                            height: "50px",
+                            height: "45px",
                             borderRadius: "8px",
+                            fontSize: "14px",
                           },
                           "& .MuiInputLabel-root": {
-                            top: "-2px",
+                            top: "-3px",
                             fontSize: "14px",
                           },
                         }}
@@ -538,11 +518,12 @@ function College() {
                         onChange={handleChange}
                         sx={{
                           "& .MuiInputBase-root": {
-                            height: "50px",
+                            height: "45px",
                             borderRadius: "8px",
+                            fontSize: "14px",
                           },
                           "& .MuiInputLabel-root": {
-                            top: "-2px",
+                            top: "-3px",
                             fontSize: "14px",
                           },
                         }}
@@ -566,11 +547,12 @@ function College() {
                         onChange={handleChange}
                         sx={{
                           "& .MuiInputBase-root": {
-                            height: "50px",
+                            height: "45px",
                             borderRadius: "8px",
+                            fontSize: "14px",
                           },
                           "& .MuiInputLabel-root": {
-                            top: "-2px",
+                            top: "-3px",
                             fontSize: "14px",
                           },
                         }}
@@ -591,11 +573,12 @@ function College() {
                     onChange={handleChange}
                     sx={{
                       "& .MuiInputBase-root": {
-                        height: "50px",
+                        height: "45px",
                         borderRadius: "8px",
+                        fontSize: "14px",
                       },
                       "& .MuiInputLabel-root": {
-                        top: "-2px",
+                        top: "-3px",
                         fontSize: "14px",
                       },
                     }}
@@ -610,7 +593,9 @@ function College() {
                         alignItems: "center",
                       }}
                     >
-                      <h4>Course</h4>
+                      <h4 style={{ fontWeight: "600", fontSize: "16px" }}>
+                        Course
+                      </h4>
                       {(createOrEdit === "create" ||
                         createOrEdit === "edit") && (
                         <div
@@ -635,12 +620,203 @@ function College() {
                         style={{
                           fontSize: "14px",
                           border: "1px solid lightgray",
-                          padding: "10px",
-                          borderRadius: "8px",
-                          margin: "20px 0px",
+                          padding: "20px 0px",
+                          borderRadius: "5px",
+                          margin: "20px 30px",
+                          boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                          backgroundColor: "#f0f0f0",
                         }}
                       >
                         <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          {createOrEdit === "edit" && (
+                            <CreateIcon
+                              fontSize="small"
+                              onClick={() => {
+                                setOpenDialog(true);
+                                setCourseDetail({
+                                  course_id: item?.course_id,
+                                  admission_fee: item?.admission_fee,
+                                  service_charge: item?.service_charge,
+                                  hostel_term_1: item?.hostel_term_1,
+                                  hostel_term_2: item?.hostel_term_2,
+                                  hostel_term_3: item?.hostel_term_3,
+                                  hostel_term_4: item?.hostel_term_4,
+                                  hostel_term_5: item?.hostel_term_5,
+                                  tuition_term_1: item?.tuition_term_1,
+                                  tuition_term_2: item?.tuition_term_2,
+                                  tuition_term_3: item?.tuition_term_3,
+                                  tuition_term_4: item?.tuition_term_4,
+                                  tuition_term_5: item?.tuition_term_5,
+                                });
+                                setTutionFee({
+                                  hostel_term_1: item?.hostel_term_1,
+                                  hostel_term_2: item?.hostel_term_2,
+                                  hostel_term_3: item?.hostel_term_3,
+                                  hostel_term_4: item?.hostel_term_4,
+                                  hostel_term_5: item?.hostel_term_5,
+                                  tuition_term_1: item?.tuition_term_1,
+                                  tuition_term_2: item?.tuition_term_2,
+                                  tuition_term_3: item?.tuition_term_3,
+                                  tuition_term_4: item?.tuition_term_4,
+                                  tuition_term_5: item?.tuition_term_5,
+                                });
+                              }}
+                            />
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            flexDirection: "column",
+                            textAlign: "center",
+                          }}
+                        >
+                          <Avatar
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              fontWeight: "500",
+                              fontSize: "40px",
+                              backgroundColor: "white",
+                              color: "gray",
+                            }}
+                          >
+                            {courseList
+                              ?.find((course) => course?.id == item?.course_id)
+                              ?.name.charAt(0)}
+                          </Avatar>
+                          <span
+                            style={{
+                              backgroundColor: "white",
+                              padding: "5px 8px",
+                              borderRadius: "20px",
+                              marginTop: "10px",
+                            }}
+                          >
+                            {
+                              courseList?.find(
+                                (course) => course?.id == item?.course_id
+                              )?.name
+                            }
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            padding: "20px 30px 0px 30px",
+                            justifyContent: "center",
+                            gap: "50px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              marginTop: "10px",
+                              flexDirection: "column",
+                              textAlign: "center",
+                            }}
+                          >
+                            <span style={{ fontWeight: "600" }}>
+                              Admission Fee
+                            </span>
+                            <span style={{ color: "gray" }}>
+                              {item?.admission_fee}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              marginTop: "10px",
+                              flexDirection: "column",
+                              textAlign: "center",
+                            }}
+                          >
+                            <span style={{ fontWeight: "600" }}>
+                              Service Fee
+                            </span>
+                            <span style={{ color: "gray" }}>
+                              {item?.service_charge}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "20px 30px",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          {Array(
+                            Number(
+                              courseList?.find(
+                                (course) => course?.id == item?.course_id
+                              )?.duration
+                            )
+                          )
+                            .fill(null)
+                            .map((_, index) => (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  flexDirection: "column",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <span style={{ fontWeight: "600" }}>
+                                  Tution Fee Term {index + 1}
+                                </span>
+                                <span style={{ color: "gray" }}>
+                                  {item?.[`tuition_term_${index + 1}`]}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            padding: "0px 30px",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          {Array(
+                            Number(
+                              courseList?.find(
+                                (course) => course?.id == item?.course_id
+                              )?.duration
+                            )
+                          )
+                            .fill(null)
+                            .map((_, index) => (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  flexDirection: "column",
+                                  textAlign: "center",
+                                }}
+                              >
+                                <span style={{ fontWeight: "600" }}>
+                                  Hostel Fee Term {index + 1}:
+                                </span>
+                                <span style={{ color: "gray" }}>
+                                  {item?.[`hostel_term_${index + 1}`]}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                        {/* <div
                           style={{
                             display: "flex",
                             justifyContent: "flex-end",
@@ -778,7 +954,7 @@ function College() {
                                 </div>
                               ))}
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     ))}
                     {openDialog && (
@@ -788,7 +964,11 @@ function College() {
                         content={
                           <div>
                             <div style={{ padding: "0px 20px 0px 20px" }}>
-                              <h4>Courses</h4>
+                              <h4
+                                style={{ fontWeight: "600", fontSize: "16px" }}
+                              >
+                                Courses
+                              </h4>
                               <div
                                 style={{
                                   display: "flex",
@@ -802,8 +982,9 @@ function College() {
                                   name="course_id"
                                   style={{
                                     width: "100%",
-                                    height: "50px",
+                                    height: "45px",
                                     borderRadius: "8px",
+                                    border: "1px solid gray",
                                   }}
                                   disabled={createOrEdit == "edit"}
                                   value={courseDetail?.course_id}
@@ -838,12 +1019,12 @@ function College() {
                                 onChange={handleCourseChange}
                                 sx={{
                                   "& .MuiInputBase-root": {
-                                    height: "50px",
+                                    height: "45px",
                                     borderRadius: "8px",
                                   },
                                   "& .MuiInputLabel-root": {
-                                    top: "-2px",
-                                    fontSize: "14px",
+                                    top: "-3px",
+                                    fontSize: "13px",
                                   },
                                 }}
                               />
@@ -857,12 +1038,12 @@ function College() {
                                 onChange={handleCourseChange}
                                 sx={{
                                   "& .MuiInputBase-root": {
-                                    height: "50px",
+                                    height: "45px",
                                     borderRadius: "8px",
                                   },
                                   "& .MuiInputLabel-root": {
-                                    top: "-2px",
-                                    fontSize: "14px",
+                                    top: "-3px",
+                                    fontSize: "13px",
                                   },
                                 }}
                               />

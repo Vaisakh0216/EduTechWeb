@@ -16,7 +16,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomAccordion from "../../atoms/Accordion";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
@@ -28,14 +28,21 @@ import college from "../../../assets/college.svg";
 import admission from "../../../assets/admission.svg";
 import agent from "../../../assets/agent.svg";
 import course from "../../../assets/course.svg";
+import { Avatar } from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
-const drawerWidth = 280;
+const drawerWidth = 230;
 
 function ResponsiveDrawer(props) {
   const { window } = props;
+  const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const [currentPath, setCurrentPath] = React.useState("");
+  const userData = JSON.parse(localStorage.getItem("userInfo"));
+  console.log("the name", userData?.name);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -54,64 +61,114 @@ function ResponsiveDrawer(props) {
 
   const redirectToPage = (val) => {
     navigate(`/${val}`);
+    setCurrentPath(val);
+  };
+
+  const AdmissionMenu = {
+    main: "Admission",
+    sub: ["Admission", "College", "Course", "Agent"],
+  };
+
+  const CRMenu = {
+    main: "CRM",
+    sub: ["Leads", "Calls"],
   };
 
   const Menu = [
     {
       key: "Dashboard",
-      icon: <DashboardIcon style={{ color: "white" }} />,
+      icon: <DashboardIcon />,
     },
     {
-      key: "Admission",
+      key: (
+        <CustomAccordion
+          mainMenus={AdmissionMenu?.main}
+          subMenus={AdmissionMenu?.sub}
+        />
+      ),
       icon: <img src={admission} width={25} height={25} />,
     },
     {
-      key: "Agent",
-      icon: <img src={agent} width={20} height={20} />,
-    },
-    {
-      key: "College",
-      icon: <img src={college} width={20} height={20} />,
-    },
-    {
-      key: "Course",
-      icon: <img src={course} width={20} height={20} />,
+      key: <CustomAccordion mainMenus={CRMenu?.main} subMenus={CRMenu?.sub} />,
+      icon: <SupportAgentIcon />,
     },
     {
       key: "Payment",
-      icon: <CurrencyRupeeIcon style={{ color: "white" }} />,
+      icon: <CurrencyRupeeIcon />,
     },
     {
       key: "Daybook",
-      icon: <MenuBookIcon style={{ color: "white" }} />,
+      icon: <MenuBookIcon s />,
     },
     {
       key: "Cashbook",
-      icon: <ManageAccountsIcon style={{ color: "white" }} />,
+      icon: <ManageAccountsIcon />,
     },
   ];
 
+  console.log("this is props", location?.pathname, currentPath);
+
   const drawer = (
-    <div style={{ backgroundColor: "#031C30", height: "100%" }}>
+    <div
+      style={{
+        backgroundColor: "white",
+        height: "100%",
+      }}
+    >
       <Toolbar
         style={{
           display: "flex",
           justifyContent: "center",
-          height: "80px",
+          height: "72px",
           backgroundColor: "white",
         }}
       >
-        <img src={logo} width="180px" height="60px" />
+        <img src={logo} width="150px" height="40px" />
       </Toolbar>
       <Divider />
       <List style={{ marginTop: "20px" }}>
         {Menu.map((text, index) => (
-          <ListItem key={text.key} disablePadding style={{ marginTop: "10px" }}>
-            <ListItemButton>
-              <ListItemIcon>{text?.icon}</ListItemIcon>
+          <ListItem
+            key={text.key}
+            disablePadding
+            style={{
+              marginTop: "5px",
+            }}
+          >
+            <ListItemButton
+              style={{
+                backgroundColor:
+                  text.key == location?.pathname?.split("/")[1]
+                    ? "#898989"
+                    : "",
+                margin: "0px 10px",
+                borderRadius: "10px",
+              }}
+            >
+              <ListItemIcon
+                style={{
+                  color:
+                    text.key == location?.pathname?.split("/")[1]
+                      ? "white"
+                      : "#898989",
+                }}
+              >
+                {text?.icon}
+              </ListItemIcon>
               {typeof text.key === "string" ? (
                 <ListItemText
-                  style={{ color: "white" }}
+                  sx={{
+                    "& .MuiListItemText-primary": {
+                      fontSize: "14px",
+                      fontWeight: "500",
+                    },
+                  }}
+                  style={{
+                    color:
+                      text.key == location?.pathname?.split("/")[1]
+                        ? "white"
+                        : "black",
+                  }}
                   primary={text.key}
                   onClick={() => {
                     redirectToPage(text.key);
@@ -139,21 +196,62 @@ function ResponsiveDrawer(props) {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          backgroundColor: "#031C30",
-          height: "80px",
+          backgroundColor: "white",
+          height: "72px",
         }}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: 2, display: { sm: "none" }, color: "#898989" }}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div"></Typography>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <NotificationsIcon sx={{ color: "#898989", marginRight: "20px" }} />
+            <Avatar sx={{ width: "40px", height: "40px" }}>
+              {userData?.name.charAt(0)}
+            </Avatar>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                marginLeft: "10px",
+              }}
+            >
+              <span
+                style={{ color: "black", fontSize: "14px", fontWeight: 500 }}
+              >
+                {userData?.name}
+              </span>
+              <span
+                style={{
+                  color: "black",
+                  fontSize: "12px",
+                  color: "#898989",
+                  textTransform: "capitalize",
+                }}
+              >
+                {userData?.role}
+              </span>
+            </div>
+          </div>
         </Toolbar>
       </AppBar>
       <Box

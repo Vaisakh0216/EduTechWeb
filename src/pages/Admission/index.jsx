@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, InputAdornment, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import BasicTable from "../../components/atoms/Table";
 import Drawer from "../../components/atoms/Drawer";
@@ -14,6 +14,8 @@ import { format } from "date-fns";
 import { listAdmissions } from "../../services/listAdmissions";
 import { createAgentFee } from "../../services/createAgentFee";
 import { updateCourseFee } from "../../services/updateCourseFee";
+import SearchIcon from "@mui/icons-material/Search";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 function Onboard() {
   const [open, setOpen] = useState(false);
@@ -348,7 +350,7 @@ function Onboard() {
 
   return (
     <div>
-      <div
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -425,39 +427,79 @@ function Onboard() {
             Create Admission
           </Button>
         </div>
-      </div>
-      <div style={{ marginTop: "20px" }}>
+      </div> */}
+      <div>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            margin: "10px",
+            width: "100%",
+            alignItems: "center",
           }}
         >
           <div>
-            <h3>All Admissions</h3>
+            <h2 style={{ fontWeight: "600" }}> Admissions</h2>
           </div>
-          {/* <div
+          <div
             style={{
               display: "flex",
-              gap: "5px",
-              alignItems: "center",
-              fontSize: "14px",
+              justifyContent: "center",
+              alignContent: "center",
+              gap: "10px",
             }}
           >
-            <span>Show</span>
-            <span
+            <TextField
+              placeholder="Search..."
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              sx={{
+                "& .MuiInputBase-root": {
+                  height: "40px",
+                  borderRadius: "8px",
+                  backgroundColor: "white",
+                },
+                "& .MuiInputBase-input::placeholder": {
+                  fontSize: "14px",
+                },
+              }}
+            />
+            <Button
+              variant="outlined"
+              startIcon={<FilterListIcon />}
               style={{
-                padding: "10px 18px",
+                height: "40px",
+                borderRadius: "8px",
+                fontSize: "14px",
+                textTransform: "capitalize",
                 backgroundColor: "white",
-                border: "1px solid lightblue",
-                borderRadius: "5px",
+                color: "black",
               }}
             >
-              5
-            </span>
-            <span>Per page</span>
-          </div> */}
+              Filter
+            </Button>
+            <Button
+              variant="contained"
+              style={{
+                background: "linear-gradient(to right, #14ADD6, #384295)",
+                fontSize: "14px",
+                textTransform: "inherit",
+                cursor: "pointer",
+                padding: "10px 30px",
+                borderRadius: "8px",
+                height: "40px",
+              }}
+              onClick={() => setOpen(true)}
+            >
+              Create Admission
+            </Button>
+          </div>
         </div>
         <BasicTable
           columns={columns}
@@ -484,7 +526,6 @@ function Onboard() {
                 <ClearIcon onClick={() => setOpen(false)} />
               </div>
               <div style={{ padding: "50px 20px" }}>
-                {/* Admission Date Container Start */}
                 <div
                   style={{ display: "flex", gap: "10px", marginTop: "20px" }}
                 >

@@ -13,6 +13,8 @@ import Daybook from "./pages/Daybook";
 import Cashbook from "./pages/Cashbook";
 import AgentDetail from "./pages/Admission/Agents/agentDetail";
 import Onboard from "./pages/Admission/index";
+import Leads from "./pages/CustomerManagement/Leads";
+import Calls from "./pages/CustomerManagement/Calls";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
             <Route path="/Agent/:id" element={<AgentDetail />} />
             <Route path="/Daybook" element={<Daybook />} />
             <Route path="/Cashbook" element={<Cashbook />} />
+            <Route path="/Leads" element={<Leads />} />
+            <Route path="/Calls" element={<Calls />} />
           </Route>
         </Route>
       </Routes>
