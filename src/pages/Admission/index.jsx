@@ -16,6 +16,7 @@ import { createAgentFee } from "../../services/createAgentFee";
 import { updateCourseFee } from "../../services/updateCourseFee";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import CreateIcon from "@mui/icons-material/Create";
 
 function Onboard() {
   const [open, setOpen] = useState(false);
@@ -81,6 +82,7 @@ function Onboard() {
   const [agentList, setAgentList] = useState([]);
   const [courseDetail, setCourseDetail] = useState();
   const [totalFeeToPay, setTotalFeeToPay] = useState(0);
+  const [createOrEdit, setCreateOrEdit] = useState("");
 
   const fetchData = async () => {
     try {
@@ -217,104 +219,17 @@ function Onboard() {
         return formData;
       };
 
-      console.log("this is admissionPayload", admissionPayload);
       createAdmission(convertToFormData(admissionPayload)).then((res) => {
         fetchData();
         setOpen(false);
-        // if (res?.id) {
-        //   setAgentFeelist((prev) => {
-        //     const updated = {
-        //       main: {
-        //         ...prev.main,
-        //         admission_id: res.id,
-        //       },
-        //       sub: {
-        //         ...prev.sub,
-        //         admission_id: res.id,
-        //       },
-        //       college: {
-        //         ...prev.college,
-        //         admission_id: res.id,
-        //       },
-        //     };
-
-        //     createAgentFee(updated.main).then((res) =>
-        //       console.log("Main Fee Response", res)
-        //     );
-        //     createAgentFee(updated.sub).then((res) =>
-        //       console.log("Sub Fee Response", res)
-        //     );
-        //     createAgentFee(updated.college).then((res) =>
-        //       console.log("College Fee Response", res)
-        //     );
-
-        //     return updated;
-        //   });
-        // }
       });
-      // const studentPayload = {
-      // first_name: studentData?.first_name,
-      // last_name: studentData?.last_name,
-      // email: studentData?.email,
-      // dob: format(dobDate, "dd-MM-yyyy"),
-      //   course_id: admissionData?.course_id,
-      //   gender: studentData?.gender,
-      //   institute_id: admissionData?.institute_id,
-      // phone: studentData?.phone,
-      // religion: studentData?.religion,
-      // plus_two_stream: studentData?.plus_two_stream,
-      // parent_phone_1: studentData?.parent_phone_1,
-      // parent_phone_2: studentData?.parent_phone_2,
-      // };
-      // createStudent(studentPayload).then((res) => {
-      //   const admissionPayload = {
-      //     student_id: res?.id,
-      //     institute_id: admissionData?.institute_id,
-      //     course_id: admissionData?.course_id,
-
-      // status: admissionData?.status,
-      // branch_id: admissionData?.branch_id,
-      //     agent_id: agentFeelist["main"]?.agent_id,
-      //   };
-      //   createAdmission(admissionPayload).then((res) => {
-      //     if (res?.id) {
-      //       setAgentFeelist((prev) => {
-      //         const updated = {
-      //           main: {
-      //             ...prev.main,
-      //             admission_id: res.id,
-      //           },
-      //           sub: {
-      //             ...prev.sub,
-      //             admission_id: res.id,
-      //           },
-      //           college: {
-      //             ...prev.college,
-      //             admission_id: res.id,
-      //           },
-      //         };
-
-      //         createAgentFee(updated.main).then((res) =>
-      //           console.log("Main Fee Response", res)
-      //         );
-      //         createAgentFee(updated.sub).then((res) =>
-      //           console.log("Sub Fee Response", res)
-      //         );
-      //         createAgentFee(updated.college).then((res) =>
-      //           console.log("College Fee Response", res)
-      //         );
-
-      //         return updated;
-      //       });
-      //     }
-      //   });
-      // });
     });
   };
 
-  const getDetail = (res) => {
+  const getDetail = (res, rowIndex) => {
     setOpen(true);
-    console.log("this is res", res);
+    setCreateOrEdit("detail");
+    console.log("this is res", admissionCompleteList[rowIndex]);
   };
 
   useEffect(() => {
@@ -350,84 +265,6 @@ function Onboard() {
 
   return (
     <div>
-      {/* <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          backgroundColor: "white",
-          padding: "30px",
-          borderRadius: "10px",
-          boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: "10px",
-            width: "100%",
-          }}
-        >
-          <span style={{ fontSize: "14px" }}>Search by admission number</span>
-          <TextField
-            id="outlined-basic"
-            label="Number"
-            variant="outlined"
-            sx={{
-              "& .MuiInputBase-root": {
-                height: "45px",
-                borderRadius: "8px",
-              },
-              "& .MuiInputLabel-root": {
-                top: "-5px",
-                fontSize: "14px",
-              },
-            }}
-            value={admissionNumber}
-            onChange={(e) => setAdmissionNumber(e.target.value)}
-          />
-        </div>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <span style={{ fontSize: "30px", fontWeight: "bold" }}>
-            {admissionCompleteList?.length}
-          </span>
-          <p style={{ padding: "0px", margin: "0px", fontSize: "14px" }}>
-            Total Admissions
-          </p>
-        </div>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            variant="contained"
-            style={{
-              background: "linear-gradient(to right, #14ADD6, #384295)",
-              fontSize: "16px",
-              textTransform: "inherit",
-              cursor: "pointer",
-              padding: "10px 30px",
-              borderRadius: "15px",
-            }}
-            onClick={() => setOpen(true)}
-          >
-            Create Admission
-          </Button>
-        </div>
-      </div> */}
       <div>
         <div
           style={{
@@ -495,7 +332,10 @@ function Onboard() {
                 borderRadius: "8px",
                 height: "40px",
               }}
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+                setCreateOrEdit("create");
+              }}
             >
               Create Admission
             </Button>
@@ -522,8 +362,23 @@ function Onboard() {
                   borderBottom: "1px solid gray",
                 }}
               >
-                <h3>Create Admission</h3>
-                <ClearIcon onClick={() => setOpen(false)} />
+                <h3>
+                  {createOrEdit === "detail"
+                    ? "Update Admission"
+                    : "Create Admission"}
+                </h3>{" "}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                  }}
+                >
+                  {createOrEdit === "detail" && (
+                    <CreateIcon onClick={() => setCreateOrEdit("edit")} />
+                  )}
+                  <ClearIcon onClick={() => setOpen(false)} />
+                </div>
               </div>
               <div style={{ padding: "50px 20px" }}>
                 <div
@@ -542,6 +397,7 @@ function Onboard() {
                       selected={admissionDate}
                       onChange={(date) => setAdmissionDate(date)}
                       placeholderText="DD-MM-YYYY"
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -562,6 +418,7 @@ function Onboard() {
                       }}
                       value={admissionData?.branch_id}
                       onChange={handleAdmission}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="1">Mysore</option>
                     </select>
@@ -584,6 +441,7 @@ function Onboard() {
                       }}
                       value={admissionData?.branch_id}
                       onChange={handleAdmission}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="1">2024-2025</option>
                       <option value="1">2025-2026</option>
@@ -613,6 +471,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                     <TextField
                       id="outlined-basic"
@@ -632,6 +491,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -656,6 +516,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                     <TextField
                       id="outlined-basic"
@@ -675,6 +536,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -685,6 +547,7 @@ function Onboard() {
                       selected={dobDate}
                       onChange={(date) => setDobDate(date)}
                       placeholderText="DOB"
+                      disabled={createOrEdit == "detail"}
                     />
                     <select
                       id="my-select"
@@ -697,6 +560,7 @@ function Onboard() {
                       }}
                       value={studentData?.gender}
                       onChange={handleStudent}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -718,6 +582,7 @@ function Onboard() {
                       }}
                       value={studentData?.religion}
                       onChange={handleStudent}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select Religion</option>
                       <option value="Humanity">Humanity</option>
@@ -736,6 +601,7 @@ function Onboard() {
                       }}
                       value={studentData?.plus_two_stream}
                       onChange={handleStudent}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select +2 Stream</option>
                       <option value="Science">Science</option>
@@ -766,6 +632,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />{" "}
                     <TextField
                       id="outlined-basic"
@@ -786,6 +653,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -809,6 +677,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                     <TextField
                       id="outlined-basic"
@@ -828,6 +697,7 @@ function Onboard() {
                           fontSize: "14px",
                         },
                       }}
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                 </div>
@@ -847,6 +717,7 @@ function Onboard() {
                       }}
                       value={admissionData?.institute_id}
                       onChange={handleAdmission}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select College</option>
 
@@ -865,6 +736,7 @@ function Onboard() {
                       }}
                       value={admissionData?.course_id}
                       onChange={handleAdmission}
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select Course</option>
                       {collegeList
@@ -909,6 +781,7 @@ function Onboard() {
                                   fontSize: "14px",
                                 },
                               }}
+                              disabled={createOrEdit == "detail"}
                             />
                           ))
                       : ""}
@@ -946,6 +819,7 @@ function Onboard() {
                                   fontSize: "14px",
                                 },
                               }}
+                              disabled={createOrEdit == "detail"}
                             />
                           ))
                       : ""}
@@ -965,6 +839,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("main", "agent_id", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select Main Aent</option>
                       {agentList
@@ -994,6 +869,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("main", "amount", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -1012,6 +888,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("sub", "agent_id", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select Sub Aent</option>
                       {agentList
@@ -1041,6 +918,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("sub", "amount", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                   <div
@@ -1059,6 +937,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("college", "agent_id", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     >
                       <option value="">Select College Aent</option>
                       {agentList
@@ -1088,6 +967,7 @@ function Onboard() {
                       onChange={(e) =>
                         handleChange("college", "amount", e.target.value)
                       }
+                      disabled={createOrEdit == "detail"}
                     />
                   </div>
                 </div>
