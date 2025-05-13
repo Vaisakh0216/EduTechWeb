@@ -230,6 +230,31 @@ function Onboard() {
     setOpen(true);
     setCreateOrEdit("detail");
     console.log("this is res", admissionCompleteList[rowIndex]);
+    setStudentData({
+      address: admissionCompleteList[rowIndex]?.student?.address,
+      course_id: admissionCompleteList[rowIndex]?.course_id,
+      dob: admissionCompleteList[rowIndex]?.student?.dob,
+      email: admissionCompleteList[rowIndex]?.student?.email,
+      first_name: admissionCompleteList[rowIndex]?.student?.first_name,
+      gender: admissionCompleteList[rowIndex]?.student?.gender,
+      institute_id: admissionCompleteList[rowIndex]?.institute_id,
+      last_name: admissionCompleteList[rowIndex]?.student?.last_name,
+      parent_phone_1: admissionCompleteList[rowIndex]?.student?.parent_phone_1,
+      parent_phone_2: admissionCompleteList[rowIndex]?.student?.parent_phone_2,
+      phone: admissionCompleteList[rowIndex]?.student?.phone,
+      plus_two_stream:
+        admissionCompleteList[rowIndex]?.student?.plus_two_stream,
+      reference: admissionCompleteList[rowIndex]?.student?.ref_platform,
+      religion: admissionCompleteList[rowIndex]?.student?.religion,
+    });
+    setAdmissionData({
+      agent_id: admissionCompleteList[rowIndex]?.agent_id,
+      branch_id: admissionCompleteList[rowIndex]?.branch_id,
+      course_id: admissionCompleteList[rowIndex]?.course_id,
+      institute_id: admissionCompleteList[rowIndex]?.institute_id,
+      status: admissionCompleteList[rowIndex]?.status,
+      student_id: admissionCompleteList[rowIndex]?.student?.id,
+    });
   };
 
   useEffect(() => {

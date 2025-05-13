@@ -15,6 +15,8 @@ import ClearIcon from "@mui/icons-material/Clear";
 import CustomCircularProgress from "../../../components/atoms/CircularProgress";
 import Drawer from "../../../components/atoms/Drawer";
 import AreaChart from "../../Dashboard/AdmissionBars";
+import CreateIcon from "@mui/icons-material/Create";
+import { updateLead } from "../../../services/updateLead";
 
 function Leads() {
   const columns = [
@@ -38,6 +40,8 @@ function Leads() {
   const [open, setOpen] = useState(false);
   const [createOrEdit, setCreateOrEdit] = useState("");
   const [loading, setLoading] = useState(false);
+  const [completeLeadList, setCompleteLeadList] = useState([]);
+  const [selectedLead, setSelectedLead] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,6 +53,7 @@ function Leads() {
 
   const getLeadsList = () => {
     listLeads().then((res) => {
+      setCompleteLeadList(res);
       setLeadsRow(
         res?.map((item) => {
           return {
@@ -80,10 +85,32 @@ function Leads() {
       notes: leadData?.notes,
       branch_id: "1",
     };
-    createLead(payload).then((res) => {
-      setLoading(false);
-      setOpen(false);
-      getLeadsList();
+    if (createOrEdit == "create") {
+      createLead(payload).then((res) => {
+        setLoading(false);
+        setOpen(false);
+        getLeadsList();
+      });
+    } else {
+      updateLead(payload, selectedLead?.id).then((res) => {
+        setLoading(false);
+        setOpen(false);
+        getLeadsList();
+      });
+    }
+  };
+
+  const getLeadDetail = (data, rowIndex) => {
+    console.log(completeLeadList[rowIndex]);
+    setOpen(true);
+    setCreateOrEdit("detail");
+    setSelectedLead(completeLeadList[rowIndex]);
+    setLeadData({
+      email: completeLeadList[rowIndex]?.email,
+      name: completeLeadList[rowIndex]?.name,
+      notes: completeLeadList[rowIndex]?.notes,
+      phone: completeLeadList[rowIndex]?.phone,
+      source: completeLeadList[rowIndex]?.source,
     });
   };
 
@@ -107,10 +134,15 @@ function Leads() {
                 <h3 style={{ fontWeight: "700", fontSize: "18px" }}>
                   {createOrEdit === "create" ? "Create Lead" : "Update Lead"}
                 </h3>
-                <ClearIcon
-                  onClick={() => setOpen(false)}
-                  style={{ cursor: "pointer" }}
-                />
+                <div>
+                  {createOrEdit === "detail" && (
+                    <CreateIcon onClick={() => setCreateOrEdit("edit")} />
+                  )}
+                  <ClearIcon
+                    onClick={() => setOpen(false)}
+                    style={{ cursor: "pointer" }}
+                  />
+                </div>
               </div>
               <div style={{ padding: "20px 20px 0px 20px" }}>
                 <>
@@ -136,12 +168,15 @@ function Leads() {
                         "& .MuiInputBase-root": {
                           height: "50px",
                           borderRadius: "8px",
+                          fontFamily: "poppins",
+                          fontSize: "14px",
                         },
                         "& .MuiInputLabel-root": {
                           top: "-2px",
                           fontSize: "14px",
                         },
                       }}
+                      disabled={leadData && createOrEdit == "detail"}
                       value={leadData?.name}
                       onChange={handleChange}
                     />
@@ -155,12 +190,15 @@ function Leads() {
                         "& .MuiInputBase-root": {
                           height: "50px",
                           borderRadius: "8px",
+                          fontFamily: "poppins",
+                          fontSize: "14px",
                         },
                         "& .MuiInputLabel-root": {
                           top: "-2px",
                           fontSize: "14px",
                         },
                       }}
+                      disabled={leadData && createOrEdit == "detail"}
                       value={leadData?.email}
                       onChange={handleChange}
                     />
@@ -184,12 +222,15 @@ function Leads() {
                         "& .MuiInputBase-root": {
                           height: "50px",
                           borderRadius: "8px",
+                          fontFamily: "poppins",
+                          fontSize: "14px",
                         },
                         "& .MuiInputLabel-root": {
                           top: "-2px",
                           fontSize: "14px",
                         },
                       }}
+                      disabled={leadData && createOrEdit == "detail"}
                       value={leadData?.phone}
                       onChange={handleChange}
                     />
@@ -204,12 +245,15 @@ function Leads() {
                         "& .MuiInputBase-root": {
                           height: "50px",
                           borderRadius: "8px",
+                          fontFamily: "poppins",
+                          fontSize: "14px",
                         },
                         "& .MuiInputLabel-root": {
                           top: "-2px",
                           fontSize: "14px",
                         },
                       }}
+                      disabled={leadData && createOrEdit == "detail"}
                       value={leadData?.source}
                       onChange={handleChange}
                     />
@@ -234,14 +278,18 @@ function Leads() {
                         padding: "10px",
                         border: "1px solid lightgray",
                         maxHeight: "300px",
+                        backgroundColor: "white",
+                        color:
+                          leadData && createOrEdit == "detail" ? "#9E9E9E" : "",
                       }}
+                      disabled={leadData && createOrEdit == "detail"}
                       value={leadData?.notes}
                       onChange={handleChange}
                     />
                   </div>
                 </>
               </div>
-              {createOrEdit === "create" && (
+              {(createOrEdit == "create" || createOrEdit == "edit") && (
                 <div
                   style={{
                     padding: "50px 20px",
@@ -268,7 +316,13 @@ function Leads() {
                     }}
                     onClick={() => submitLead()}
                   >
-                    {loading ? <CustomCircularProgress /> : "Create"}
+                    {loading ? (
+                      <CustomCircularProgress />
+                    ) : createOrEdit == "edit" ? (
+                      "Update"
+                    ) : (
+                      "Create"
+                    )}
                   </Button>
                 </div>
               )}
@@ -289,14 +343,14 @@ function Leads() {
           <h2 style={{ fontWeight: "600" }}> Leads</h2>
         </div>
       </div>
-      <div style={{ marginBottom: "20px" }}>
+      {/* <div style={{ marginBottom: "20px" }}>
         <AreaChart
           title="Leads Range"
           subtitle="Leads of each days"
           width={1200}
           height={300}
         />
-      </div>
+      </div> */}
       <div
         style={{
           margin: "auto",
@@ -360,6 +414,7 @@ function Leads() {
             onClick={() => {
               setOpen(true);
               setCreateOrEdit("create");
+              setLeadData({});
             }}
           >
             Create Lead
@@ -367,7 +422,11 @@ function Leads() {
         </div>
       </div>
       <div style={{ marginTop: "80px" }}>
-        <BasicTable columns={columns} rows={leadsRow} />
+        <BasicTable
+          columns={columns}
+          rows={leadsRow}
+          onClickFunction={getLeadDetail}
+        />
       </div>
     </div>
   );
